@@ -1,0 +1,66 @@
+[package]
+name = "yueyi-desktop"
+version = "0.1.0"
+description = "月忆 · Desktop — AI Personal Memory OS"
+authors = ["QT新月"]
+edition = "2021"
+
+[lib]
+name = "yueyi_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png", "custom-protocol"] }
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.32", features = ["bundled"] }
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4"] }
+dirs = "5"
+base64 = "0.22"
+image = { version = "0.25", default-features = false, features = ["png"] }
+arboard = "3"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "blocking"] }
+thiserror = "1"
+
+# Windows 能力：GDI 截图 + WinRT OCR
+[target.'cfg(windows)'.dependencies.windows]
+version = "0.58"
+features = [
+    "Win32_Graphics_Gdi",
+    "Win32_Graphics_Dwm",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Shell",
+    "Win32_System_Com",
+    "Win32_System_Threading",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_System_WinRT",
+    "Win32_Foundation",
+    "Graphics_Imaging",
+    "Media_Ocr",
+    "Foundation",
+    "Storage_Streams",
+    "Security_Cryptography",
+]
+
+[patch.crates-io]
+# 修复上游 schemars 0.8.22 与 indexmap 1.x 的类型别名 bug（preserve_order feature）
+# schemars 0.8.22 的 Map 定义少了第 3 个泛型参数，导致编译失败
+schemars = { path = "../vendor/schemars" }
+
+[profile.release]
+panic = "abort"
+codegen-units = 16
+lto = "thin"
+opt-level = "s"
+strip = true
+

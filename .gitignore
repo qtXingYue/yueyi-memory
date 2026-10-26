@@ -1,0 +1,31 @@
+# 备份与归档
+.ui-backup/
+yueyi-desktop/.ui-backup/
+*.zip
+
+# 运行数据
+YueyiData/
+yueyi-desktop/YueyiData/
+*.db
+*.db-shm
+*.db-wal
+
+# WorkBuddy 项目元数据
+.workbuddy/
+
+# 构建产物（子目录另有 .gitignore）
+node_modules/
+dist/
+target/
+
+# 视觉回归基线（含个人数据截图，不入库）
+docs/ui-baseline/
+
+# 构建产物与日志（不入库）
+*.log
+*.exe
+yueyi-desktop/cargo-*.log
+
+# 证书/密钥
+*.cer
+*.pem

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/app-icon.png" />
+    <title>月忆</title>
+    <style>
+      /* 与主题 token 保持一致，避免启动瞬间闪成另一种底色 */
+      html { background: #ECEFF5; }
+      html[data-theme="night"] { background: #0C1019; }
+    </style>
+    <script src="/boot-guard.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

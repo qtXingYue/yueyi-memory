@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>月忆 · UI 方案对比稿</title>
+<style>
+/* ===== 设计 token：直接抄自 src/styles/globals.css 的 pearl 主题 ===== */
+:root{
+  --c-base:236 239 245; --c-panel:252 253 255; --c-panel2:241 244 250; --c-border:226 231 240;
+  --c-ink:24 32 48; --c-ink-dim:82 94 118; --c-ink-faint:112 124 149;
+  --c-accent:56 98 228; --c-accent-rgb:56,98,228; --c-moon:201 164 92; --c-moon-rgb:201,164,92;
+  --c-warn:217 119 6; --c-danger:225 29 72;
+  --ring-hair:0 0 0 1px rgba(15,23,42,.055);
+  --elev-1:var(--ring-hair),0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.04);
+  --elev-2:var(--ring-hair),0 10px 28px rgba(15,23,42,.09),0 2px 6px rgba(15,23,42,.04);
+  --workspace-bg:#fcfdff; --shell-bg:#eceff5; --card-bg:#fff;
+  --workspace-glow:radial-gradient(120% 60% at 0% 0%,rgba(56,98,228,.035),transparent 60%);
+  --workspace-shadow:0 1px 3px rgba(15,23,42,.04),0 6px 24px rgba(15,23,42,.03);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#e9ecf3; color:rgb(var(--c-ink));
+  font-family:"Inter Variable","Inter","PingFang SC","Microsoft YaHei UI",system-ui,sans-serif;
+  font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased; padding:40px 32px 96px;
+}
+h1.doc{font-size:26px;font-weight:800;letter-spacing:-.02em;max-width:1120px;margin:0 auto 6px}
+p.lede{max-width:1120px;margin:0 auto 34px;color:rgb(var(--c-ink-dim));font-size:13.5px}
+section{max-width:1120px;margin:0 auto 52px}
+h2.sec{font-size:17px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:9px}
+h2.sec .n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+  border-radius:7px;background:rgb(var(--c-accent));color:#fff;font-size:12px;font-weight:700}
+.secnote{color:rgb(var(--c-ink-dim));font-size:13px;margin-bottom:18px;max-width:900px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.pair>div{min-width:0}
+@media (max-width:1180px){.pair{grid-template-columns:1fr}}
+.tagrow{display:flex;gap:8px;margin-bottom:9px;align-items:center}
+.tag{font-size:11px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:6px}
+.tag.bad{background:rgba(225,29,72,.1);color:rgb(var(--c-danger))}
+.tag.good{background:rgba(var(--c-accent-rgb),.12);color:rgb(var(--c-accent))}
+.frame{border-radius:14px;background:var(--shell-bg);box-shadow:var(--elev-2);overflow:hidden;position:relative}
+.cap{font-size:11.5px;color:rgb(var(--c-ink-faint));margin:8px 2px 0;font-family:ui-monospace,Consolas,monospace}
+
+/* ===== app mock 基础件 ===== */
+.app{display:flex;height:100%;background:var(--shell-bg)}
+.sb{width:228px;flex-shrink:0;padding:14px 12px;display:flex;flex-direction:column}
+.sb.rail{width:64px;align-items:center}
+.brand{display:flex;gap:10px;align-items:center;padding:2px 10px 16px}
+.logo{width:36px;height:36px;border-radius:11px;background:linear-gradient(140deg,#3862E4,#6C72E0);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;flex-shrink:0}
+.brand .bn{font-size:15.5px;font-weight:700}
+.brand .bs{font-size:11px;color:rgb(var(--c-ink-faint))}
+.badge{font-size:10px;background:rgba(var(--c-accent-rgb),.1);color:rgb(var(--c-accent));
+  border-radius:5px;padding:1px 6px;font-weight:500}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nv{display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:11px;font-size:13px;
+  color:rgb(var(--c-ink-dim));position:relative}
+.nv.on{background:rgba(var(--c-accent-rgb),.08);color:rgb(var(--c-accent));font-weight:600}
+.nv.on::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:16px;border-radius:9px;background:rgb(var(--c-accent))}
+.i{width:16px;height:16px;border-radius:4px;border:1.7px solid currentColor;opacity:.75;flex-shrink:0}
+.sbl{font-size:11px;color:rgb(var(--c-ink-faint));padding:22px 12px 6px;font-weight:500}
+.cl{display:flex;gap:10px;align-items:center;padding:6px 12px;border-radius:11px;font-size:12.5px;color:rgb(var(--c-ink-dim))}
+.cl.on{background:#fff;box-shadow:var(--elev-1);font-weight:600;color:rgb(var(--c-ink))}
+.dot{width:8px;height:8px;border-radius:9px;flex-shrink:0}
+.cnt{margin-left:auto;font-family:ui-monospace,Consolas,monospace;font-size:10.5px;color:rgb(var(--c-ink-faint))}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.tb{height:46px;flex-shrink:0;display:flex;align-items:center;gap:8px;padding:0 10px}
+.pill{height:30px;border-radius:10px;background:#fff;box-shadow:var(--elev-1);display:flex;
+  align-items:center;gap:9px;padding:0 11px;font-size:12px;color:rgb(var(--c-ink-faint));min-width:0}
+.kbd{border-radius:5px;background:rgb(var(--c-panel2));padding:0 5px;font-family:ui-monospace,Consolas,monospace;
+  font-size:10px;color:rgb(var(--c-ink-dim));box-shadow:var(--ring-hair)}
+.tbtn{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:rgb(var(--c-ink-dim));background:rgba(255,255,255,.75)}
+.tbtn.on{background:#fff;color:rgb(var(--c-accent));box-shadow:var(--elev-1)}
+.sheet{flex:1;min-height:0;margin:0 10px 10px 0;background-color:var(--workspace-bg);
+  background-image:var(--workspace-glow);box-shadow:var(--workspace-shadow);
+  border-radius:16px;display:flex;overflow:hidden}
+.canvas{flex:1;min-width:0;overflow:hidden;padding:0 28px 24px}
+.tool{height:56px;display:flex;align-items:center;gap:10px}
+.tool h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.count{border-radius:99px;background:rgb(var(--c-panel2));padding:1px 10px;font-size:12px;
+  font-family:ui-monospace,Consolas,monospace;color:rgb(var(--c-ink-dim))}
+.seg{display:flex;gap:2px;padding:3px;border-radius:12px;background:rgb(var(--c-panel2));margin-left:auto}
+.seg span{padding:4px 12px;border-radius:9px;font-size:12.5px;color:rgb(var(--c-ink-dim))}
+.seg .on{background:var(--c-panel);color:rgb(var(--c-ink));font-weight:600;box-shadow:var(--elev-1)}
+.btn{border-radius:11px;padding:6px 12px;font-size:12.5px;font-weight:500;background:rgb(var(--c-panel2));color:rgb(var(--c-ink-dim))}
+.btn.p{background:rgb(var(--c-accent));color:#fff;box-shadow:0 2px 8px rgba(var(--c-accent-rgb),.22)}
+.composer{margin-top:4px;border-radius:16px;background:rgba(var(--c-panel2),.85);padding:12px 16px;
+  display:flex;gap:10px;align-items:center;font-size:14px;color:rgb(var(--c-ink-faint))}
+.chips{display:flex;gap:6px;margin:16px 0 20px;overflow:hidden}
+.chip{flex-shrink:0;border-radius:99px;padding:4px 12px;font-size:12.5px;background:rgb(var(--c-panel2));color:rgb(var(--c-ink-dim))}
+.chip.on{background:rgba(var(--c-accent-rgb),.14);color:rgb(var(--c-accent));font-weight:600}
+.grp{position:relative;padding-left:22px}
+.grp::before{content:"";position:absolute;left:5px;top:14px;bottom:-18px;width:1px;
+  background:linear-gradient(to bottom,rgba(var(--c-accent-rgb),.28),rgba(var(--c-accent-rgb),.06))}
+.node{position:absolute;left:0;top:7px;width:11px;height:11px;border-radius:9px;background:var(--c-panel);
+  box-shadow:0 0 0 2px rgba(var(--c-accent-rgb),.45)}
+.day{display:flex;align-items:baseline;gap:8px;padding:4px 0 10px}
+.day b{font-size:14px}
+.day em{font-style:normal;font-size:12px;color:rgb(var(--c-ink-faint))}
+.day i{font-style:normal;margin-left:auto;font-family:ui-monospace,Consolas,monospace;font-size:12px;color:rgb(var(--c-ink-faint))}
+.stack{display:flex;flex-direction:column;gap:12px}
+
+/* ===== 记忆卡 ===== */
+.mc{position:relative;background:var(--card-bg);box-shadow:var(--elev-1);border-radius:16px;padding:16px}
+.mc .body{min-width:0;flex:1}
+.siterow{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;color:rgb(var(--c-ink-dim))}
+.av{width:20px;height:20px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;background:rgba(var(--c-accent-rgb),.14);color:rgb(var(--c-accent))}
+.mc h3{font-size:15px;font-weight:600;line-height:1.35;letter-spacing:-.01em}
+.mc .sum{margin-top:6px;font-size:13px;color:rgb(var(--c-ink-dim));line-height:1.55;position:relative;padding-left:12px}
+.mc .sum::before{content:"";position:absolute;left:0;top:2px;bottom:2px;width:2px;border-radius:2px;background:rgba(var(--c-accent-rgb),.4)}
+.meta{margin-top:12px;display:flex;align-items:center;gap:10px;font-size:12px;color:rgb(var(--c-ink-faint));flex-wrap:wrap}
+.sdot{width:6px;height:6px;border-radius:9px;background:rgb(var(--c-moon));flex-shrink:0}
+.sdot.proc{background:rgb(var(--c-accent))} .dot-fail{background:rgb(var(--c-warn))}
+.pillc{display:flex;align-items:center;gap:6px;border-radius:7px;background:rgb(var(--c-panel2));
+  padding:1px 8px;color:rgb(var(--c-ink-dim))}
+.tg{border-radius:6px;background:rgb(var(--c-panel2));padding:1px 8px;font-size:12px;color:rgb(var(--c-ink-dim))}
+.grow{flex:1}
+.thumb{margin:-16px -16px 12px;height:150px;background:linear-gradient(160deg,#dfe6f2,#eef2f8);position:relative;
+  border-radius:16px 16px 0 0;overflow:hidden}
+.thumb:after{content:"";position:absolute;inset:auto 0 0 0;height:44px;background:linear-gradient(to top,rgba(0,0,0,.34),transparent)}
+.thumb b{position:absolute;left:10px;bottom:8px;z-index:2;font-size:11px;font-weight:500;color:#fff;
+  background:rgba(0,0,0,.4);padding:1px 7px;border-radius:6px;backdrop-filter:blur(4px)}
+.code{margin-top:10px;border-radius:12px;background:#141b29;color:#94e2b8;padding:8px 12px 10px;
+  font-family:ui-monospace,Consolas,monospace;font-size:11.5px}
+.code .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.code .dts{display:flex;gap:5px}.code .dts i{width:7px;height:7px;border-radius:9px;background:rgba(255,255,255,.16)}
+.code .lang{font-size:11px;color:rgba(255,255,255,.45)}
+.acts{position:absolute;top:10px;right:10px;display:flex;gap:2px;padding:2px;border-radius:10px;
+  background:rgba(255,255,255,.92);box-shadow:var(--elev-1)}
+.acts b{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:rgb(var(--c-ink-dim));font-weight:400}
+.acts b:focus,.acts b.foc{color:rgb(var(--c-accent));background:rgba(var(--c-accent-rgb),.1);
+  outline:2px solid rgba(var(--c-accent-rgb),.5);outline-offset:1px}
+
+/* ===== 右侧概览栏 ===== */
+.ins{width:264px;flex-shrink:0;padding:24px 24px 24px 8px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.ins .blk{border-radius:16px;background:rgba(var(--c-panel2),.8);padding:14px}
+.ins .bh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;font-weight:600}
+.ins .bh em{font-style:normal;font-size:10.5px;color:rgb(var(--c-ink-faint))}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.kpi div{border-radius:11px;background:var(--c-panel);padding:9px 0}
+.kpi b{display:block;font-family:ui-monospace,Consolas,monospace;font-size:18px}
+.kpi span{font-size:10px;color:rgb(var(--c-ink-faint))}
+.rail2{width:52px;flex-shrink:0;padding:24px 0 24px 8px;display:flex;flex-direction:column;gap:10px;align-items:center}
+.rail2 .rb{width:32px;height:32px;border-radius:10px;background:rgba(var(--c-accent-rgb),.1);
+  color:rgb(var(--c-accent));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.rail2 .rl{font-size:9px;color:rgb(var(--c-ink-faint));font-family:ui-monospace,Consolas,monospace}
+
+/* ===== 标注 ===== */
+.mark{position:absolute;z-index:5;font-size:10.5px;font-weight:600;line-height:1.4;max-width:190px;
+  background:#fff;box-shadow:var(--elev-2);border-radius:9px;padding:6px 9px;color:rgb(var(--c-danger))}
+.mark.g{color:rgb(var(--c-accent))}
+.mark:before{content:"";position:absolute;width:7px;height:7px;border-radius:9px;background:currentColor}
+.cut{position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(45deg,rgba(225,29,72,.07) 0 8px,transparent 8px 16px)}
+.cutl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:700;
+  color:rgb(var(--c-danger));background:#fff;box-shadow:var(--elev-1);border-radius:7px;padding:3px 9px;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border-radius:12px;overflow:hidden;
+  box-shadow:var(--elev-1)}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid rgb(var(--c-border));vertical-align:top}
+th{background:rgb(var(--c-panel2));font-size:11.5px;font-weight:600;color:rgb(var(--c-ink-dim))}
+td code{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;background:rgba(var(--c-accent-rgb),.08);
+  color:rgb(var(--c-accent));border-radius:5px;padding:1px 5px}
+tr:last-child td{border-bottom:none}
+ul.fix{list-style:none;font-size:13px;display:flex;flex-direction:column;gap:7px;margin-top:14px}
+ul.fix li{display:flex;gap:9px;align-items:flex-start;color:rgb(var(--c-ink-dim))}
+ul.fix li b{color:rgb(var(--c-ink));font-weight:600}
+ul.fix li:before{content:"→";color:rgb(var(--c-accent));font-weight:700;flex-shrink:0}
+.anno{background:#fff;box-shadow:var(--elev-1);border-radius:14px;padding:18px 20px;font-size:13px}
+.stack3{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.lay{display:flex;align-items:center;gap:10px;border-radius:10px;padding:8px 12px;background:rgb(var(--c-panel2));font-size:12.5px}
+.lay .lv{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:rgb(var(--c-ink-faint));margin-left:auto}
+.lay.top{background:rgba(var(--c-accent-rgb),.1);color:rgb(var(--c-accent));font-weight:600}
+</style>
+</head>
+<body>
+
+<h1 class="doc">月忆 · UI 方案对比稿</h1>
+<p class="lede">
+覆盖三块已确认范围：<b>断点与布局收敛</b>、<b>键盘与无障碍基线</b>、<b>死代码与一致性</b>。
+左侧为现状（按实际渲染复刻），右侧为建议。token / 阴影 / 圆角全部沿用 <code>src/styles/globals.css</code> 的 pearl 主题，不改视觉语言，只改布局驱动方式与信息架构。
+</p>
+
+<!-- ============ 1 ============ -->
+<section>
+  <h2 class="sec"><span class="n">1</span>断点驱动：视口断点 → 容器查询</h2>
+  <p class="secnote">
+    现状有三套互不知晓的宽度判断：概览栏用 CSS <code>hidden lg:flex</code>（视口 ≥1024）、侧栏用 JS <code>innerWidth</code> 980/1120、窗口本身默认 1180 / 最小 960。
+    在 <b>1024–1120</b> 这段，概览栏和完整侧栏同时出现，卡片列被挤到约 530px，而它按 860px 设计。
+  </p>
+  <div class="pair">
+    <div>
+      <div class="tagrow"><span class="tag bad">现状</span><span class="cap">窗口 1024px · 概览栏 lg 命中 + 侧栏未折叠</span></div>
+      <div class="frame" style="height:398px">
+        <div class="app" style="width:1024px;transform:scale(.51);transform-origin:0 0;height:780px">
+          <div class="sb">
+            <div class="brand"><div class="logo">月</div><div><div style="display:flex;gap:6px;align-items:center"><span class="bn">月忆</span><span class="badge">本地记忆库</span></div><div class="bs">静谧整理 · 随时回溯</div></div></div>
+            <div class="nav"><div class="nv on"><span class="i"></span>时间线</div><div class="nv"><span class="i"></span>合集</div><div class="nv"><span class="i"></span>搜索与问答</div><div class="nv"><span class="i"></span>设置</div></div>
+          </div>
+          <div class="main">
+            <div class="tb"><div class="tbtn">▢</div><div class="pill" style="width:200px">🔍 搜索记忆或向 AI 提问…</div><div class="tbtn" style="margin-left:auto">☀</div><div class="tbtn on">▯</div><div class="tbtn">—</div><div class="tbtn">✕</div></div>
+            <div class="sheet">
+              <div class="canvas" style="padding:0 20px">
+                <div class="tool"><h1>时间线</h1><span class="count">12</span><div class="seg"><span class="on">全部</span><span>今天</span><span>本周</span></div></div>
+                <div class="composer" style="font-size:13px">随手记下一句话…</div>
+                <div class="chips"><span class="chip on">全部</span><span class="chip">截图与图片</span><span class="chip">笔记</span></div>
+                <div class="grp"><span class="node"></span><div class="day"><b>今天</b><em>10月11日</em><i>5 条</i></div>
+                  <div class="stack">
+                    <div class="mc"><div class="siterow"><span class="av">M</span>yueyi-img.xn--localhost…<span>↗</span></div><h3>Tauri 2 自定义协议在 WebView2 下的坑</h3><div class="sum">记录 yueyi-img 协议在 Windows 上必须走 http://…</div><div class="meta"><span class="sdot"></span>手动记录<span>·</span>1 小时前<span class="pillc"><span class="dot" style="background:#2DD4A7"></span>学习笔记</span><span class="grow"></span><span class="tg">#Tauri</span><span class="tg">#WebView2</span></div></div>
+                    <div class="mc"><div class="thumb"><b>截屏</b></div><h3>DeepSeek 返回被 ```json 包裹</h3><div class="meta"><span class="sdot"></span>窗口截图<span class="grow"></span><span class="tg">#解析</span></div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="ins"><div class="blk"><div class="bh">记忆概览<em>14天趋势</em></div><div class="kpi"><div><b>12</b><span>总计</span></div><div><b>4</b><span>截图</span></div><div><b>3</b><span>网页</span></div></div></div><div class="blk"><div class="bh">常用标签</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tg">#Tauri 2</span><span class="tg">#Rust 2</span><span class="tg">#解析 1</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="cut" style="left:230px;right:140px;top:120px;bottom:20px"></div>
+        <div class="cutl" style="left:300px;top:210px">卡片列 ≈ 530px（按 860px 设计）</div>
+        <div class="mark" style="left:236px;top:78px;max-width:170px">假站点头：正文里出现 URL 就被识别成链接卡</div>
+        <div class="mark" style="right:150px;bottom:26px;max-width:150px">标签被 flex-1 推到最右，中间留死白</div>
+      </div>
+    </div>
+    <div>
+      <div class="tagrow"><span class="tag good">建议</span><span class="cap">同宽 · 概览栏按 sheet 实际宽度降级为图标轨</span></div>
+      <div class="frame" style="height:398px">
+        <div class="app" style="width:1024px;transform:scale(.51);transform-origin:0 0;height:780px">
+          <div class="sb">
+            <div class="brand"><div class="logo">月</div><div><div style="display:flex;gap:6px;align-items:center"><span class="bn">月忆</span><span class="badge">本地记忆库</span></div><div class="bs">静谧整理 · 随时回溯</div></div></div>
+            <div class="nav"><div class="nv on"><span class="i"></span>时间线</div><div class="nv"><span class="i"></span>合集</div><div class="nv"><span class="i"></span>搜索与问答</div><div class="nv"><span class="i"></span>设置</div></div>
+          </div>
+          <div class="main">
+            <div class="tb"><div class="tbtn">▢</div><div class="pill" style="width:200px">🔍 搜索记忆或向 AI 提问…</div><div class="tbtn" style="margin-left:auto">☀</div><div class="tbtn">▯</div><div class="tbtn">—</div><div class="tbtn">✕</div></div>
+            <div class="sheet">
+              <div class="canvas" style="padding:0 24px">
+                <div class="tool"><h1>时间线</h1><span class="count">12</span><div class="seg"><span class="on">全部</span><span>今天</span><span>本周</span></div></div>
+                <div class="composer" style="font-size:13px">随手记下一句话…</div>
+                <div class="chips"><span class="chip on">全部</span><span class="chip">截图与图片</span><span class="chip">笔记</span></div>
+                <div class="grp"><span class="node"></span><div class="day"><b>今天</b><em>10月11日</em><i>5 条</i></div>
+                  <div class="stack">
+                    <div class="mc"><h3>Tauri 2 自定义协议在 WebView2 下的坑</h3><div class="sum">记录 yueyi-img 协议在 Windows 上必须走 http://yueyi-img.localhost</div><div class="meta"><span class="sdot"></span>手动记录<span>·</span>1 小时前<span class="pillc"><span class="dot" style="background:#2DD4A7"></span>学习笔记</span><span class="tg">#Tauri</span><span class="tg">#WebView2</span><span class="tg">+1</span></div></div>
+                    <div class="mc"><div class="thumb"><b>截屏</b></div><h3>DeepSeek 返回被 ```json 包裹导致解析失败</h3><div class="meta"><span class="sdot"></span>窗口截图<span>·</span>2 小时前<span class="pillc"><span class="dot" style="background:#2DD4A7"></span>学习笔记</span><span class="tg">#DeepSeek</span><span class="tg">#解析</span><span class="tg">+2</span></div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="rail2"><div class="rb">12</div><div class="rl">总计</div><div class="rb">4</div><div class="rl">截图</div><div class="rb">#</div><div class="rl">标签</div><div class="rb" style="margin-top:auto">↗</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="mark g" style="right:8px;bottom:26px;max-width:150px">概览栏收成 52px 图标轨，卡片列回到 ≈700px</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:22px" class="anno">
+    <b style="font-size:13.5px">规则表：以 <code>container-name: work</code>（workspace-sheet）为唯一宽度真源</b>
+    <table style="margin-top:12px">
+      <tr><th style="width:130px">sheet 可用宽</th><th style="width:150px">侧栏</th><th style="width:170px">概览栏</th><th>卡片列</th></tr>
+      <tr><td><code>&lt; 620px</code></td><td>图标轨 64px</td><td>隐藏</td><td>流式，<code>px-5</code></td></tr>
+      <tr><td><code>620–820px</code></td><td>图标轨 64px</td><td>图标轨 52px</td><td>流式，<code>px-6</code></td></tr>
+      <tr><td><code>820–1000px</code></td><td>完整 228px</td><td>图标轨 52px</td><td>流式，<code>px-6</code></td></tr>
+      <tr><td><code>&gt; 1000px</code></td><td>完整 228px</td><td>完整 264px</td><td><code>clamp(560px, 100%, 820px)</code></td></tr>
+    </table>
+    <ul class="fix">
+      <li><b>删掉三套判断，只留一套</b>：<code>AiInsightPanel</code> 的 <code>hidden lg:flex</code> 与 <code>Sidebar</code> 的 <code>innerWidth</code> 980/1120 全部改为 <code>@container work</code>；JS 只保留"用户手动折叠"的偏好。</li>
+      <li><b>TopBar 的概览按钮改为三态循环</b>（完整 → 图标轨 → 隐藏），任何宽度下都有反馈，修掉现在 &lt;1024px 时点了没反应的问题。</li>
+      <li><b>卡片列宽从 <code>max-w-[860px]</code> 改为 <code>clamp()</code></b>，配合 <code>text-wrap: balance</code>，窄栏下不再出现两字断行。</li>
+      <li><b>链接自动识别收窄</b>：<code>MemoryCard.tsx:94-102</code> 只在 <code>type === 'link'</code> 或 <code>source_url</code> 非空时渲染站点头，不再正则扫正文/摘要。</li>
+      <li><b>元信息行去掉 <code>flex-1</code> 撑杆</b>（<code>MemoryCard.tsx:337</code>），标签紧跟合集胶囊自然换行；标题行 <code>pr-16</code> 改为只在 hover/focus 有操作条时预留。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section>
+  <h2 class="sec"><span class="n">2</span>卡片信息架构：三种类型各归其位</h2>
+  <p class="secnote">卡片是这个产品最小的信息单元，也是密度问题的根源。这里只调结构，不动材质层级与配色。</p>
+  <div class="pair">
+    <div>
+      <div class="tagrow"><span class="tag bad">现状</span><span class="cap">笔记卡被误判成链接卡 + 元信息断裂</span></div>
+      <div class="frame" style="padding:18px;background:var(--workspace-bg)">
+        <div class="mc" style="max-width:660px">
+          <div class="siterow"><span class="av">M</span><span>yueyi-img&nbsp;&nbsp;yueyi-img.xn--localhost,-189p10e88ki5kuz0iro0e</span><span>↗</span></div>
+          <h3 style="padding-right:64px">Tauri 2 自定义协议在 WebView2 下的坑</h3>
+          <div class="sum">记录 yueyi-img 协议在 Windows 上必须走 http://yueyi-img.localhost，否则图片全部 404。</div>
+          <div class="meta"><span class="sdot"></span>手动记录<span>·</span>1 小时前<span class="pillc"><span class="dot" style="background:#2DD4A7"></span>学习笔记</span><span class="grow"></span><span class="tg">#Tauri</span><span class="tg">#WebView2</span><span class="tg">#协议</span></div>
+          <div class="cut" style="left:300px;right:170px;top:auto;height:26px;bottom:22px"></div>
+        </div>
+        <div class="cap" style="margin-top:12px">正文提到一个 URL，就长出一条能"打开浏览器"的站点头 → 打开的是垃圾地址</div>
+      </div>
+    </div>
+    <div>
+      <div class="tagrow"><span class="tag good">建议</span><span class="cap">笔记 / 链接 / 截图 三型</span></div>
+      <div class="frame" style="padding:18px;background:var(--workspace-bg);display:flex;flex-direction:column;gap:12px">
+        <div class="mc">
+          <h3>离散数学 · 归结原理的三个常用子句</h3>
+          <div class="sum">把 ¬p∨q 与 ¬q∨r 化简为 ¬p∨r 后，与前提 ¬p 直接推出 r。</div>
+          <div class="meta"><span class="sdot"></span>手动记录<span>·</span>1 小时前<span class="pillc"><span class="dot" style="background:#2DD4A7"></span>学习笔记</span><span class="tg">#离散数学</span><span class="tg">#归结原理</span></div>
+        </div>
+        <div class="mc">
+          <div class="siterow"><span class="av" style="background:rgba(225,29,72,.12);color:#E11D48">B</span><b style="font-weight:600">哔哩哔哩</b><span style="font-family:ui-monospace,monospace;font-size:11.5px;color:rgb(var(--c-ink-faint))">bilibili.com</span></div>
+          <h3>如何用 20 分钟理解命题逻辑</h3>
+          <div class="meta"><span class="sdot"></span>剪贴板<span>·</span>昨天 14:20<span class="pillc"><span class="dot" style="background:#2DD4A7"></span>学习笔记</span><span class="tg">#视频</span></div>
+        </div>
+        <div class="mc" style="padding-top:0">
+          <div class="thumb" style="height:112px;margin:0 -16px 12px;border-radius:16px 16px 0 0"><b>区域截图 · 1440×900</b></div>
+          <h3>DeepSeek 返回被 ```json 包裹导致解析失败</h3>
+          <div class="meta"><span class="sdot proc"></span>AI 整理中<span>·</span>2 小时前<span class="pillc"><span class="dot" style="background:#2DD4A7"></span>学习笔记</span><span class="tg">#DeepSeek</span><span class="tg">#解析</span><span class="tg">+2</span></div>
+        </div>
+        <div class="cap">截图卡缩略图通栏但压到 112px；来源/时间/合集/标签一行连续排布，无死白</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section>
+  <h2 class="sec"><span class="n">3</span>键盘与无障碍基线</h2>
+  <p class="secnote">现状：抽屉 / 编辑器 / 命令面板都没有 dialog 语义，无焦点陷阱与焦点归还；批量选择的"复选框"是个 <code>div</code>；卡片操作条只靠 hover 出现；引导弹窗无法跳过。</p>
+  <div class="pair">
+    <div class="anno">
+      <b style="font-size:13.5px">浮层 Esc 栈（建议实现）</b>
+      <p style="color:rgb(var(--c-ink-dim));margin:6px 0 2px;font-size:12.5px">在 store 里维护一个栈，Esc 只弹最上层，关闭后焦点还给打开它的元素。</p>
+      <div class="stack3">
+        <div class="lay top">区域框选覆盖层<span class="lv">z-200</span></div>
+        <div class="lay">命令面板 Ctrl+K<span class="lv">z-[?] 无 role</span></div>
+        <div class="lay">记忆详情抽屉<span class="lv">无 aria-modal</span></div>
+        <div class="lay">新建记忆编辑器<span class="lv">唯一处理 Esc</span></div>
+        <div class="lay">首次引导<span class="lv">无跳过 / Esc 无效</span></div>
+      </div>
+      <ul class="fix">
+        <li><b>统一 <code>role="dialog" aria-modal="true" aria-labelledby</code></b>，配 <code>useFocusTrap</code>（进入锁焦、关闭归还），一个 hook 覆盖三处。</li>
+        <li><b>命令面板补 listbox 语义</b>：<code>role="listbox"</code> + <code>aria-activedescendant</code>，光标项 <code>scrollIntoView({block:'nearest'})</code>，鼠标 hover 不再污染键盘光标。</li>
+        <li><b>批量选择换成 <code>role="checkbox" aria-checked</code></b>（或视觉隐藏的 native input），可 Tab 到、可读屏播报。</li>
+        <li><b>hover-only 操作条改为 <code>:hover</code> + <code>:focus-within</code></b>：合集卡与记忆卡的编辑/删除键盘可达。</li>
+        <li><b>引导加"跳过"并接 Esc</b>；<code>Settings</code> 的开关补 <code>role="switch" aria-checked</code>，表单控件补 <code>htmlFor</code>。</li>
+      </ul>
+    </div>
+    <div>
+      <div class="tagrow"><span class="tag good">建议</span><span class="cap">卡片操作条在键盘聚焦时常驻</span></div>
+      <div class="frame" style="padding:18px;background:var(--workspace-bg)">
+        <div class="mc" style="box-shadow:var(--elev-2)">
+          <div class="acts"><b>↗</b><b class="foc">⧉</b><b>🗑</b></div>
+          <h3>rusqlite bundled 迁移写法</h3>
+          <div class="code"><div class="hd"><span class="dts"><i></i><i></i><i></i></span><span class="lang">RUST</span></div>let mut conn = Connection::open(path)?;<br>conn.execute_batch("PRAGMA journal_mode=WAL;")?;</div>
+          <div class="meta" style="margin-top:12px"><span class="sdot"></span>手动记录<span>·</span>3 小时前<span class="pillc"><span class="dot" style="background:#2DD4A7"></span>学习笔记</span><span class="tg">#Rust</span><span class="tg">#SQLite</span></div>
+        </div>
+        <div class="cap" style="margin-top:12px">焦点进入卡片即显示操作条（现在只有鼠标能唤出）；代码窗头部统一成 <code>.code-window-dots</code>，修掉抽屉侧单数类名无 CSS 的问题</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section>
+  <h2 class="sec"><span class="n">4</span>一致性与死代码</h2>
+  <div class="pair">
+    <div class="anno">
+      <b style="font-size:13.5px">搜索结果复用 MemoryCard</b>
+      <p style="color:rgb(var(--c-ink-dim));margin:6px 0 10px;font-size:12.5px"><code>SearchQA.tsx:222-249</code> 自己写了一套结果卡（标题/元信息/标签/合集胶囊），与时间线卡片必然漂移。改为渲染 <code>&lt;MemoryCard&gt;</code> 并传入 <code>snippet</code> 高亮槽位，一处改动两处受益。</p>
+      <div class="mc" style="box-shadow:var(--elev-1)">
+        <h3>WebView2 下的 <mark style="background:rgba(var(--c-accent-rgb),.18);color:rgb(var(--c-accent));border-radius:4px;padding:0 3px">自定义协议</mark> 注册</h3>
+        <div class="sum">…必须走 <mark style="background:rgba(var(--c-accent-rgb),.18);color:rgb(var(--c-accent));border-radius:4px;padding:0 3px">http://yueyi-img.localhost</mark>，否则图片 404…</div>
+        <div class="meta"><span class="sdot"></span>窗口截图<span>·</span>2 天前<span class="pillc"><span class="dot" style="background:#2DD4A7"></span>学习笔记</span><span class="tg">#Tauri</span></div>
+      </div>
+    </div>
+    <div class="anno">
+      <b style="font-size:13.5px">待清理清单</b>
+      <table style="margin-top:12px">
+        <tr><th>项</th><th style="width:110px">处置</th></tr>
+        <tr><td><code>components/layout/StatusBar.tsx</code> 全文件未被 <code>App.tsx</code> 挂载，README 却列为布局组件</td><td>删除</td></tr>
+        <tr><td><code>.md-body</code>（globals.css:521-559）、<code>.ai-dot</code>(512) 无任何引用；但 Composer 文案承诺"支持 Markdown"，实际按纯文本预览</td><td>删样式 + 改文案</td></tr>
+        <tr><td>代码窗双标记：卡片 <code>.code-window-dots</code> / 抽屉 <code>.code-window-header</code>·<code>.code-window-dot</code>（后者无 CSS）</td><td>合并复数</td></tr>
+        <tr><td><code>fmtTime</code>(events.ts:24)、<code>MemoryUpdatedEvent</code>(types.ts:102)、<code>Sparkline</code> 的 <code>width</code> prop</td><td>删除</td></tr>
+        <tr><td><code>Collections.tsx:25-46</code> 对每个合集各发一次 <code>memoryApi.list('all', id)</code>（N+1）</td><td>合并查询</td></tr>
+        <tr><td>硬编码色绕过 token：<code>PALETTE</code>(Collections:9)、<code>#E06C75</code>、<code>#E11D48</code>、<code>amber-500</code>、<code>emerald-300</code>、区域框选的一串 <code>#3B82F6</code>/<code>#2563EB</code></td><td>收进 token</td></tr>
+        <tr><td>抽屉里两套"移动到合集"UI（449-467 / 504-529），且都不提供"移回待整理"（<code>moveTo(null)</code> 其实可用）</td><td>合一 + 补项</td></tr>
+        <tr><td>README 第八节配色规范仍是旧的 <code>#12141A</code> + 青绿，与 v2 双主题 token 不符</td><td>更新文档</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="anno">
+    <b style="font-size:13.5px">实施顺序与影响面</b>
+    <table style="margin-top:12px">
+      <tr><th style="width:44px">序</th><th>动作</th><th style="width:230px">文件</th><th style="width:76px">风险</th></tr>
+      <tr><td>1</td><td>死代码清理 + 硬编码色收进 token + README 对齐</td><td>globals.css · StatusBar · Collections · Drawer</td><td>极低</td></tr>
+      <tr><td>2</td><td>链接识别收窄 + 卡片元信息行重排 + 代码窗类名统一</td><td>MemoryCard · MemoryDrawer</td><td>低</td></tr>
+      <tr><td>3</td><td><code>@container work</code> 接管侧栏/概览栏/卡片列，TopBar 概览按钮改三态</td><td>App · Sidebar · AiInsightPanel · TopBar · Timeline · globals.css</td><td>中</td></tr>
+      <tr><td>4</td><td><code>useFocusTrap</code> + dialog 语义 + Esc 栈 + listbox + 真 checkbox</td><td>新增 hooks/useFocusTrap · Palette · Drawer · Composer · Onboarding · Settings</td><td>中</td></tr>
+      <tr><td>5</td><td>搜索结果复用 MemoryCard（带 snippet 槽位）</td><td>SearchQA · MemoryCard</td><td>低</td></tr>
+    </table>
+    <p style="color:rgb(var(--c-ink-dim));margin-top:12px;font-size:12.5px">
+      注：Tailwind 3.4 的 <code>@container</code> 需要官方 <code>@tailwindcss/container-queries</code> 插件（新增一个 devDependency）。若不想加依赖，可以退一步：保留 JS 测量，但把 <code>innerWidth</code> 换成对 <code>workspace-sheet</code> 的 <code>ResizeObserver</code>，用 <code>data-size="sm|md|lg"</code> 驱动同一套规则——效果等价，且顺带修掉 <code>Segmented.tsx</code> 滑块在窗口缩放后位置失效的老问题。
+    </p>
+  </div>
+</section>
+
+</body>
+</html>
