@@ -1497,3 +1497,63 @@ html[data-theme="night"] .sidebar-surface {
   background: var(--card-hover-bg);
   color: rgb(var(--c-ink));
 }
+
+/* =====================================================================
+   Workbench v2 · 桌面工作台布局
+   放弃悬浮玻璃面板：侧栏与工作区贴边，窗口即应用。
+   1180–1399 两列（每列约 390px），1400+ 三列。
+   ===================================================================== */
+.app-shell {
+  background: var(--workspace-bg);
+}
+.app-shell::before {
+  opacity: 0.42;
+}
+.sidebar-surface {
+  margin: 0;
+  border-radius: 0;
+  border: 0;
+  border-right: 1px solid var(--c-border-soft);
+  background: var(--c-panel);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.workspace-sheet {
+  margin: 0;
+  border-radius: 0;
+  border: 0;
+  background: var(--workspace-bg);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.topbar-surface {
+  background: var(--c-panel);
+  border-bottom: 1px solid var(--c-border-soft);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.page-measure {
+  --measure: 1120px;
+  --pad: clamp(20px, 2.4vw, 30px);
+}
+[data-layout="md"] .memory-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+[data-layout="lg"] .memory-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.memory-grid {
+  gap: 18px;
+}
+.memory-grid .memory-card-surface {
+  border-radius: 14px;
+}
+.memory-grid .media-bleed,
+.text-cover {
+  border-radius: 14px 14px 0 0;
+}
+.memory-grid .media-bleed img {
+  height: 170px;
+}
