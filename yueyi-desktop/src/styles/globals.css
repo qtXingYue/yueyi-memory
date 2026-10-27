@@ -322,7 +322,7 @@ h3 {
 @layer components {
   .btn-primary {
     @apply relative inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5
-      text-[12.5px] font-medium text-white;
+      text-[13px] font-medium text-white;
     background: rgb(var(--c-accent));
     box-shadow: 0 2px 8px rgba(var(--c-accent-rgb), 0.22);
     transition:
@@ -340,7 +340,7 @@ h3 {
   }
 
   .btn-ghost {
-    @apply inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[12.5px] font-medium
+    @apply inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[13px] font-medium
       text-ink-dim;
     transition:
       background-color 0.2s ease,
@@ -358,7 +358,7 @@ h3 {
 
   .btn-outline {
     @apply inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5
-      text-[12.5px] font-medium text-ink-dim;
+      text-[13px] font-medium text-ink-dim;
     background: rgb(var(--c-panel2));
     border: none;
     transition:
@@ -377,7 +377,7 @@ h3 {
 
   .btn-danger {
     @apply inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5
-      text-[12.5px] font-medium;
+      text-[13px] font-medium;
     color: rgb(var(--c-danger));
     background: rgb(var(--c-danger) / 0.1);
     transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
@@ -589,7 +589,7 @@ h3 {
   z-index: 1;
   border-radius: 9px;
   padding: 4px 12px;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 500;
   color: rgb(var(--c-ink-dim));
   transition: color 0.2s ease;
@@ -621,7 +621,7 @@ h3 {
   flex-shrink: 0;
   border-radius: 999px;
   padding: 4px 12px;
-  font-size: 12.5px;
+  font-size: 13px;
   color: rgb(var(--c-ink-dim));
   background: rgb(var(--c-panel2));
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -706,6 +706,16 @@ h3 {
 .status-badge[data-status="pending"] {
   color: rgb(var(--c-ink-dim));
   background: rgb(var(--c-panel2));
+}
+.status-badge-action {
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+.status-badge-action:hover {
+  filter: brightness(1.05);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* 卡片悬停操作条 */

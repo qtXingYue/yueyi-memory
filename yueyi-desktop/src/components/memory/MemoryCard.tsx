@@ -111,7 +111,8 @@ function MemoryCard({
   const summaryText = snippet || memory.summary || memory.ai_summary || "";
   const bodyText = summaryText || (!isCode && memory.content ? memory.content.slice(0, 160) : "");
   // 文本/剪贴板的内容已经出现在封面里，避免重复占高度；代码有 CodePreview
-  const showBody = Boolean(bodyText) && !isNote && !isCode;
+  // 剪贴板保留摘要补足卡片高度；纯笔记的正文已在封面，避免重复
+  const showBody = Boolean(bodyText) && !isCode && !(isNote && memory.type !== "clipboard");
   const recentlyCaptured =
     isNew || Date.now() - new Date(memory.created_at).getTime() < NEW_WINDOW_MS;
 
