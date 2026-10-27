@@ -5,7 +5,6 @@ import {
   Layers,
   MessageSquareText,
   History,
-  ChevronLeft,
   Search,
   Settings2,
   Pencil,
@@ -14,6 +13,7 @@ import {
   ArrowUp,
   ArrowDown,
   Check,
+  MoonStar,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -372,7 +372,7 @@ export default function Sidebar() {
       <div className="mt-4 flex min-h-0 flex-1 flex-col border-t border-base-border/40 pt-3">
         <div className="mb-1.5 flex items-center justify-between px-2.5">
           <span className="flex items-baseline gap-1.5">
-            <span className="text-[12px] font-medium text-ink-faint">快速筛选</span>
+            <span className="text-[12px] font-medium text-ink-faint">合集</span>
             <span className="font-mono text-[12px] text-ink-faint/70">{collections.length}</span>
           </span>
           <div className="flex items-center gap-0.5">
@@ -464,17 +464,21 @@ export default function Sidebar() {
         )}
 
         <div className="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain pb-2">
-          {/* 从合集返回全部：只在有筛选时出现 */}
-          {activeCollection !== null && (
-            <button
-              onClick={() => setActiveCollection(null)}
-              className="all-memories-back"
-            >
-              <ChevronLeft size={13} />
-              <span className="flex-1 text-left text-[12px]">全部记忆</span>
-              <span className="font-mono text-[12px] text-ink-faint">{totalAll}</span>
-            </button>
-          )}
+          <button
+            onClick={() => setActiveCollection(null)}
+            data-active={activeCollection === null && page === "timeline"}
+            className={`nav-item group relative flex w-full items-center gap-2.5 rounded-xl py-1.5 pl-2 pr-2 text-left outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent/45 ${
+              activeCollection === null && page === "timeline"
+                ? "bg-accent/[0.07] font-semibold text-accent"
+                : "text-ink-dim hover:bg-base-panel/50 hover:text-ink"
+            }`}
+          >
+            <span className="collection-sigil collection-sigil-all">
+              <MoonStar size={13} strokeWidth={1.8} />
+            </span>
+            <span className="min-w-0 flex-1 truncate text-[13px]">全部记忆</span>
+            <span className="collection-count">{totalAll}</span>
+          </button>
 
           {displayedCollections.map((c) => {
             const isSelected = activeCollection === c.id && page === "timeline";
@@ -502,7 +506,7 @@ export default function Sidebar() {
                   if (canDrag && dragId !== null) e.preventDefault();
                 }}
                 onDragEnd={() => void commitOrder()}
-                className={`nav-item group relative flex w-full items-center gap-2.5 rounded-xl py-1.5 pl-3 pr-2 text-left outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent/45 ${
+                className={`nav-item group relative flex w-full items-center gap-2.5 rounded-xl py-1.5 pl-2 pr-2 text-left outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent/45 ${
                   canDrag ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"
                 } ${dragId === c.id ? "opacity-50" : ""} ${
                   isSelected
@@ -510,15 +514,14 @@ export default function Sidebar() {
                     : "text-ink-dim hover:bg-base-panel/50 hover:text-ink"
                 }`}
               >
-                {/* 色点纯展示（选中给外环），点击不再误触换色 */}
+                {/* 合集首字徽章：用用户选的颜色做身份，不再用随机圆点 */}
                 <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-full transition-shadow"
+                  className="collection-sigil"
                   title={canDrag ? "拖动排序" : undefined}
-                  style={{
-                    background: c.color,
-                    boxShadow: isSelected ? `0 0 0 3px ${c.color}33` : undefined,
-                  }}
-                />
+                  style={{ background: `${c.color}1f`, color: c.color }}
+                >
+                  {c.name.slice(0, 1)}
+                </span>
 
                 {editingId === c.id ? (
                   <input
@@ -537,7 +540,11 @@ export default function Sidebar() {
                   <span className="min-w-0 flex-1 truncate text-[13px]">{c.name}</span>
                 )}
 
-                <span className="shrink-0 font-mono text-[12px] text-ink-faint transition-opacity group-hover:opacity-0 group-focus-within:opacity-0">
+                <span
+                  className={`collection-count transition-opacity group-hover:opacity-0 group-focus-within:opacity-0 ${
+                    (c.count ?? 0) === 0 ? "is-empty" : ""
+                  }`}
+                >
                   {c.count ?? 0}
                 </span>
 
