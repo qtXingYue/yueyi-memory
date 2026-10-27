@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { X, Save, Loader2, Paperclip, Eye, Edit3, Trash2 } from "lucide-react";
-import { useApp } from "@/stores/app";
+import { useAppPick } from "@/stores/app";
 import { memoryApi, settingsApi } from "@/services/api";
 import { useFocusTrap, useOverlayEscape } from "@/hooks/useOverlay";
 import { ModalPanel, OverlayBackdrop } from "@/ui";
@@ -19,7 +19,9 @@ const TYPE_OPTIONS: { value: MemoryType; label: string }[] = [
 const DRAFT_KEY = "yueyi-composer-draft";
 
 export default function MemoryComposer() {
-  const { composerOpen, setComposerOpen, collections, refreshAll, toast } = useApp();
+  const { composerOpen, setComposerOpen, collections, refreshAll, toast } = useAppPick(
+    "composerOpen", "setComposerOpen", "collections", "refreshAll", "toast"
+  );
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [type, setType] = useState<MemoryType>("note");
@@ -272,7 +274,7 @@ export default function MemoryComposer() {
 
         {/* 底部 */}
         <div className="flex items-center justify-between border-t border-base-border/70 px-6 py-3.5">
-          <span className="text-[11px] text-ink-faint">Ctrl+Enter 快速保存 · 自动保存草稿</span>
+          <span className="text-[12px] text-ink-faint">Ctrl+Enter 快速保存 · 自动保存草稿</span>
           <div className="flex items-center gap-2">
             <button className="btn-ghost" onClick={() => setComposerOpen(false)}>取消</button>
             <button className="btn-primary" onClick={() => void save()} disabled={saving}>

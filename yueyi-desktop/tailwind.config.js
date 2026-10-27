@@ -46,7 +46,8 @@ export default {
       },
       fontFamily: {
         sans: [
-          "Inter",
+          "Segoe UI Variable Display",
+          "Segoe UI",
           "PingFang SC",
           "Microsoft YaHei UI",
           "Microsoft YaHei",

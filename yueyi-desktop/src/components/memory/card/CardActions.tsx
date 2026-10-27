@@ -86,7 +86,7 @@ export default function CardActions({
         onClick={remove}
       >
         {confirmDelete ? (
-          <span className="px-1 text-[11px] font-semibold text-danger">确认?</span>
+          <span className="px-1 text-[12px] font-semibold text-danger">确认?</span>
         ) : (
           <Trash2 size={14} />
         )}

@@ -121,14 +121,14 @@ export default function TopBar() {
         <span className="flex-1 truncate text-[12px] text-ink-faint transition-colors group-hover:text-ink-dim">
           搜索记忆或向 AI 提问…
         </span>
-        <kbd className="rounded bg-base-panel2 px-1.5 py-0.5 font-mono text-[10px] text-ink-faint">
+        <kbd className="rounded bg-base-panel2 px-1.5 py-0.5 font-mono text-[12px] text-ink-faint">
           {settings?.shortcut_search || "Ctrl+K"}
         </kbd>
       </button>
 
       {/* 中间窗口拖拽手柄区（直观提示可按住拖动） */}
       <div className="flex h-full flex-1 items-center justify-center">
-        <div className="pointer-events-none flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] text-ink-faint">
+        <div className="pointer-events-none flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] text-ink-faint">
           <GripHorizontal size={13} />
           <span className="hidden lg:inline">按住顶栏拖动窗口</span>
         </div>

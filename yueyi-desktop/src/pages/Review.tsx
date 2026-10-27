@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { CalendarClock, Check, History, Inbox, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import type { ReviewOverview } from "@/types";
 import { reviewApi, reminderApi } from "@/services/api";
-import { useApp } from "@/stores/app";
+import { useAppPick } from "@/stores/app";
 import { fmtRelative, openDrawer } from "@/utils/events";
 import { Button, EmptyState, PageHeader, SectionCard, StatTile } from "@/ui";
 import Markdown from "@/components/Markdown";
 
 export default function Review() {
-  const { toast, refreshAll } = useApp();
+  const { toast, refreshAll } = useAppPick("toast", "refreshAll");
   const [data, setData] = useState<ReviewOverview | null>(null);
   const [loading, setLoading] = useState(true);
   const [weekly, setWeekly] = useState("");
@@ -83,7 +83,7 @@ export default function Review() {
                   onClick={() => r.memory_id && openDrawer(r.memory_id)}
                 >
                   <div className="truncate text-[13px] font-medium text-ink">{r.title}</div>
-                  <div className="mt-0.5 text-[11px] text-ink-faint">{r.remind_at}</div>
+                  <div className="mt-0.5 text-[12px] text-ink-faint">{r.remind_at}</div>
                 </button>
                 <Button
                   variant="ghost"
@@ -119,7 +119,7 @@ export default function Review() {
                 <span className="min-w-0 flex-1 truncate text-[13px] text-ink-dim">
                   {m.title || "未命名记忆"}
                 </span>
-                <span className="shrink-0 text-[11px] text-ink-faint">{fmtRelative(m.created_at)}</span>
+                <span className="shrink-0 text-[12px] text-ink-faint">{fmtRelative(m.created_at)}</span>
               </button>
             ))}
           </div>
@@ -167,7 +167,7 @@ export default function Review() {
                 <span className="min-w-0 flex-1 truncate text-[13px] text-ink-dim">
                   {m.title || "未命名记忆"}
                 </span>
-                <span className="shrink-0 text-[11px] text-ink-faint">{fmtRelative(m.created_at)}</span>
+                <span className="shrink-0 text-[12px] text-ink-faint">{fmtRelative(m.created_at)}</span>
               </button>
             ))}
           </div>

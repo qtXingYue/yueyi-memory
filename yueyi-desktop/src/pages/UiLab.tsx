@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { ArrowLeft, Check, Loader2, Search, Sparkles, Trash2, X } from "lucide-react";
-import { useApp } from "@/stores/app";
+import { useAppPick } from "@/stores/app";
 import {
   Button,
   Chip,
@@ -41,7 +41,7 @@ const TYPE_SCALE = [
 
 /** UI 实验室：所有基元 × 两套主题 × 各状态，一屏看完 */
 export default function UiLab({ onClose }: { onClose: () => void }) {
-  const { theme, setTheme } = useApp();
+  const { theme, setTheme } = useAppPick("theme", "setTheme");
   const [popOpen, setPopOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
   const [rect, setRect] = useState<DOMRect | null>(null);
@@ -88,7 +88,7 @@ export default function UiLab({ onClose }: { onClose: () => void }) {
               {TYPE_SCALE.map(([name, size, sample]) => (
                 <div key={name} className="flex items-baseline justify-between gap-3 border-b border-base-border/40 pb-1 last:border-0">
                   <span style={{ fontSize: size }} className="text-ink">{sample} {size}</span>
-                  <span className="font-mono text-[10px] text-ink-faint">--text-{name}</span>
+                  <span className="font-mono text-[12px] text-ink-faint">--text-{name}</span>
                 </div>
               ))}
             </div>
@@ -217,7 +217,7 @@ export default function UiLab({ onClose }: { onClose: () => void }) {
               ] as const).map(([r, cls]) => (
                 <div key={r} className="flex flex-col items-center gap-1">
                   <div className={`h-12 w-16 bg-base-panel2 ring-1 ring-base-border/60 ${cls}`} />
-                  <span className="font-mono text-[10px] text-ink-faint">--radius-{r}</span>
+                  <span className="font-mono text-[12px] text-ink-faint">--radius-{r}</span>
                 </div>
               ))}
               <div className="mx-3 h-10 w-px bg-base-border/60" />
@@ -228,8 +228,8 @@ export default function UiLab({ onClose }: { onClose: () => void }) {
                 ["slower", "360ms"],
               ].map(([name, ms]) => (
                 <div key={name} className="rounded-lg bg-base-panel2 px-2.5 py-1.5 text-center">
-                  <div className="font-mono text-[11px] text-ink">{ms}</div>
-                  <div className="text-[10px] text-ink-faint">--dur-{name}</div>
+                  <div className="font-mono text-[12px] text-ink">{ms}</div>
+                  <div className="text-[12px] text-ink-faint">--dur-{name}</div>
                 </div>
               ))}
               <Loader2 size={14} className="ml-3 animate-spin text-ink-faint" />

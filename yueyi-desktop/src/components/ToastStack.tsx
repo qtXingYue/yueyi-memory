@@ -1,4 +1,4 @@
-import { useApp } from "@/stores/app";
+import { useAppPick } from "@/stores/app";
 import { CheckCircle2, AlertCircle, Info, X } from "lucide-react";
 import { IconButton } from "@/ui";
 
@@ -15,7 +15,7 @@ const COLORS = {
 };
 
 export default function ToastStack() {
-  const { toasts, dismissToast } = useApp();
+  const { toasts, dismissToast } = useAppPick("toasts", "dismissToast");
   if (toasts.length === 0) return null;
 
   return (

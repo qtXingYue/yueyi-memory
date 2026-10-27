@@ -3,7 +3,7 @@ import {
   Search, Plus, Camera, ClipboardList, Clock, Layers, MessageSquareText,
   Settings2, CornerDownLeft, Sparkles, LucideIcon, FlaskConical, History,
 } from "lucide-react";
-import { useApp } from "@/stores/app";
+import { useApp, useAppPick } from "@/stores/app";
 import { memoryApi, captureApi } from "@/services/api";
 import { openDrawer } from "@/utils/events";
 import { useFocusTrap, useOverlayEscape } from "@/hooks/useOverlay";
@@ -55,7 +55,17 @@ export default function CommandPalette() {
     refreshAll,
     settings,
     setLabOpen,
-  } = useApp();
+  } = useAppPick(
+    "paletteOpen",
+    "setPaletteOpen",
+    "setPage",
+    "setComposerOpen",
+    "setPendingQuestion",
+    "toast",
+    "refreshAll",
+    "settings",
+    "setLabOpen"
+  );
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
   const [results, setResults] = useState<Memory[]>([]);
@@ -285,7 +295,7 @@ export default function CommandPalette() {
             aria-autocomplete="list"
             className="flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-ink-faint"
           />
-          {searching && <span className="text-[11px] text-ink-faint">搜索中…</span>}
+          {searching && <span className="text-[12px] text-ink-faint">搜索中…</span>}
           <kbd>ESC</kbd>
         </div>
 
@@ -315,7 +325,7 @@ export default function CommandPalette() {
                 >
                   <Sparkles size={15} className="text-accent" />
                   <span className="flex-1 text-[13px]">询问 AI：「{query.trim()}」</span>
-                  <kbd className="text-[10px]">Enter 提问</kbd>
+                  <kbd className="text-[12px]">Enter 提问</kbd>
                   {active && <CornerDownLeft size={12} className="text-accent" />}
                 </button>
               );
@@ -336,7 +346,7 @@ export default function CommandPalette() {
                   <Icon size={15} className={active ? "text-accent" : "text-ink-faint"} />
                   <span className="flex-1 text-[13px] font-medium text-ink">{item.action.label}</span>
                   {item.action.hint && (
-                    <kbd className="text-[10px]">{item.action.hint}</kbd>
+                    <kbd className="text-[12px]">{item.action.hint}</kbd>
                   )}
                   {active && <CornerDownLeft size={12} className="text-accent" />}
                 </button>
@@ -357,7 +367,7 @@ export default function CommandPalette() {
                 <span className="flex-1 truncate text-[13px] text-ink-dim">
                   {item.memory.title || "未命名记忆"}
                 </span>
-                <span className="text-[11px] font-mono text-ink-faint">
+                <span className="text-[12px] font-mono text-ink-faint">
                   {new Date(item.memory.created_at).toLocaleDateString("zh-CN")}
                 </span>
                 {active && <CornerDownLeft size={12} className="text-accent" />}
@@ -366,13 +376,13 @@ export default function CommandPalette() {
           })}
         </div>
 
-        <div className="flex items-center justify-between border-t border-base-border/60 bg-base-panel/40 px-5 py-2.5 text-[11px] text-ink-faint">
+        <div className="flex items-center justify-between border-t border-base-border/60 bg-base-panel/40 px-5 py-2.5 text-[12px] text-ink-faint">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1"><kbd>↑</kbd><kbd>↓</kbd> 导航</span>
             <span className="flex items-center gap-1"><kbd>↵</kbd> 执行</span>
             <span className="flex items-center gap-1"><kbd>esc</kbd> 关闭</span>
           </div>
-          <span className="text-[11px] text-ink-faint">月忆</span>
+          <span className="text-[12px] text-ink-faint">月忆</span>
         </div>
       </ModalPanel>
     </div>

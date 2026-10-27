@@ -23,7 +23,7 @@ import {
   FlaskConical,
   Info,
 } from "lucide-react";
-import { useApp } from "@/stores/app";
+import { useApp, useAppPick } from "@/stores/app";
 import { settingsApi, aiApi, memoryApi, tagApi } from "@/services/api";
 import { invoke } from "@tauri-apps/api/core";
 import { Button, PageHeader } from "@/ui";
@@ -43,7 +43,8 @@ const SECTIONS = [
 ] as const;
 
 export default function Settings() {
-  const { settings, refreshAll, toast, theme, setTheme, density, setDensity, setLabOpen } = useApp();
+  const { settings, refreshAll, toast, theme, setTheme, density, setDensity, setLabOpen } =
+    useAppPick("settings", "refreshAll", "toast", "theme", "setTheme", "density", "setDensity", "setLabOpen");
   const [apiKey, setApiKey] = useState("");
   const [baseUrl, setBaseUrl] = useState("https://api.deepseek.com");
   const [model, setModel] = useState("deepseek-chat");
@@ -342,7 +343,7 @@ export default function Settings() {
                   <span className="text-[13px] font-semibold text-ink">晴空月白 · 浅色</span>
                 </div>
                 {theme === "pearl" && (
-                  <span className="rounded-md bg-accent/12 px-2 py-0.5 text-[10px] font-semibold text-accent">
+                  <span className="rounded-md bg-accent/12 px-2 py-0.5 text-[12px] font-semibold text-accent">
                     当前
                   </span>
                 )}
@@ -368,7 +369,7 @@ export default function Settings() {
                   <span className="text-[13px] font-semibold text-ink">星夜流霞 · 深色</span>
                 </div>
                 {theme === "night" && (
-                  <span className="rounded-md bg-accent/12 px-2 py-0.5 text-[10px] font-semibold text-accent">
+                  <span className="rounded-md bg-accent/12 px-2 py-0.5 text-[12px] font-semibold text-accent">
                     当前
                   </span>
                 )}
@@ -516,7 +517,7 @@ export default function Settings() {
               <Database size={15} className="text-ink-dim" />
               <h2 className="text-[14px] font-semibold text-ink">本地存储概览</h2>
             </div>
-            <span className="rounded-lg bg-base-panel px-2.5 py-1 font-mono text-[11px] text-ink-faint">
+            <span className="rounded-lg bg-base-panel px-2.5 py-1 font-mono text-[12px] text-ink-faint">
               %USERPROFILE%\YueyiData
             </span>
           </div>
@@ -529,7 +530,7 @@ export default function Settings() {
             ].map((s) => (
               <div key={s.label} className="rounded-xl bg-base-panel py-3">
                 <div className="font-mono text-[18px] font-bold text-ink">{s.value}</div>
-                <div className="mt-0.5 text-[11px] text-ink-faint">{s.label}</div>
+                <div className="mt-0.5 text-[12px] text-ink-faint">{s.label}</div>
               </div>
             ))}
           </div>
@@ -548,7 +549,7 @@ export default function Settings() {
             >
               <Trash2 size={15} className="text-ink-dim" />
               <h2 className="text-[14px] font-semibold text-ink">回收站</h2>
-              <span className="rounded-full bg-base-panel px-2 py-0.5 font-mono text-[11px] text-ink-dim">
+              <span className="rounded-full bg-base-panel px-2 py-0.5 font-mono text-[12px] text-ink-dim">
                 {trash.length}
               </span>
               {trashOpen ? (
@@ -587,7 +588,7 @@ export default function Settings() {
                   <span className="min-w-0 flex-1 truncate text-[13px] text-ink-dim">
                     {t.title || "未命名记忆"}
                   </span>
-                  <span className="shrink-0 font-mono text-[10px] text-ink-faint">
+                  <span className="shrink-0 font-mono text-[12px] text-ink-faint">
                     {t.deleted_at}
                   </span>
                   <button
@@ -622,7 +623,7 @@ export default function Settings() {
             >
               <TagIcon size={15} className="text-ink-dim" />
               <h2 className="text-[14px] font-semibold text-ink">标签管理</h2>
-              <span className="rounded-full bg-base-panel px-2 py-0.5 font-mono text-[11px] text-ink-dim">
+              <span className="rounded-full bg-base-panel px-2 py-0.5 font-mono text-[12px] text-ink-dim">
                 {tags.length}
               </span>
               {tagsOpen ? (
@@ -631,7 +632,7 @@ export default function Settings() {
                 <ChevronDown size={13} className="text-ink-faint" />
               )}
             </button>
-            <span className="text-[11px] text-ink-faint">重命名为已有标签会自动合并</span>
+            <span className="text-[12px] text-ink-faint">重命名为已有标签会自动合并</span>
           </div>
 
           {tagsOpen && (
@@ -660,7 +661,7 @@ export default function Settings() {
                       #{t.name}
                     </span>
                   )}
-                  <span className="shrink-0 font-mono text-[10px] text-ink-faint">
+                  <span className="shrink-0 font-mono text-[12px] text-ink-faint">
                     {t.count}
                   </span>
                   <button
@@ -675,7 +676,7 @@ export default function Settings() {
                   </button>
                   <button
                     onClick={() => void deleteTag(t.name)}
-                    className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] transition-colors ${
+                    className={`shrink-0 rounded px-1.5 py-0.5 text-[12px] transition-colors ${
                       confirmTagDelete === t.name
                         ? "bg-danger text-white"
                         : "text-ink-faint hover:bg-danger/10 hover:text-danger"

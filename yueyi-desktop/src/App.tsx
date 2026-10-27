@@ -1,8 +1,7 @@
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { useApp, useAppPick, initStore } from "@/stores/app";
 import { topmostOverlay } from "@/hooks/useOverlay";
-import UiLab from "@/pages/UiLab";
 import Sidebar from "@/components/layout/Sidebar";
 import TopBar from "@/components/layout/TopBar";
 import CommandPalette from "@/components/CommandPalette";
@@ -11,28 +10,62 @@ import MemoryComposer from "@/components/memory/MemoryComposer";
 import Onboarding from "@/components/Onboarding";
 import ToastStack from "@/components/ToastStack";
 import Timeline from "@/pages/Timeline";
-import Collections from "@/pages/Collections";
-import SearchQA from "@/pages/SearchQA";
-import Review from "@/pages/Review";
-import Settings from "@/pages/Settings";
 import { memoryApi } from "@/services/api";
 
+const Collections = lazy(() => import("@/pages/Collections"));
+const SearchQA = lazy(() => import("@/pages/SearchQA"));
+const Review = lazy(() => import("@/pages/Review"));
+const Settings = lazy(() => import("@/pages/Settings"));
+const UiLab = lazy(() => import("@/pages/UiLab"));
+
+function PageFallback() {
+  return (
+    <div className="mx-auto w-full max-w-[1040px] px-1 py-8" aria-busy="true" aria-label="页面加载中">
+      <div className="skeleton mb-3 h-7 w-40" />
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="memory-card-surface rounded-2xl p-4">
+            <div className="skeleton mb-3 h-4 w-2/3" />
+            <div className="skeleton mb-2 h-3.5 w-full" />
+            <div className="skeleton h-3.5 w-4/5" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
-  const { page, refreshAll, toast, layout, applyWidth, labOpen, setLabOpen } = useAppPick(
+  const {
+    page,
+    refreshAll,
+    toast,
+    layout,
+    applyWidth,
+    labOpen,
+    setLabOpen,
+    settings,
+    onboardingOpen,
+  } = useAppPick(
     "page",
     "refreshAll",
     "toast",
     "layout",
     "applyWidth",
     "labOpen",
-    "setLabOpen"
+    "setLabOpen",
+    "settings",
+    "onboardingOpen"
+  );
+  const [keyBannerHidden, setKeyBannerHidden] = useState(
+    () => typeof window !== "undefined" && localStorage.getItem("yueyi-ai-banner") === "1"
   );
   const shellRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
   // 每个页面记住自己的滚动位置，切走再回来不会跳回顶部
   const scrollPos = useRef<Record<string, number>>({});
 
-  // 全局 Ctrl+N 新建 + Ctrl+1..4 切页（有浮层打开时不抢）
+  // 全局 Ctrl+N 新建 + Ctrl+1..5 切页（有浮层打开时不抢）
   useEffect(() => {
     const PAGES = ["timeline", "collections", "search", "review", "settings"] as const;
     const onKey = (e: KeyboardEvent) => {
@@ -239,7 +272,11 @@ export default function App() {
   }, [refreshAll, toast]);
 
   if (labOpen) {
-    return <UiLab onClose={() => setLabOpen(false)} />;
+    return (
+      <Suspense fallback={<PageFallback />}>
+        <UiLab onClose={() => setLabOpen(false)} />
+      </Suspense>
+    );
   }
 
   return (
@@ -250,6 +287,30 @@ export default function App() {
       {/* 右侧主区域：无框顶栏 + 一体化悬浮圆角工作画布 */}
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar />
+        {!onboardingOpen && settings && !settings.api_key_set && !keyBannerHidden && (
+          <div className="mx-3 mt-2 flex flex-wrap items-center gap-2 rounded-xl border border-base-border bg-base-panel2 px-3 py-2 text-[12px] text-ink-dim">
+            <span className="min-w-0 flex-1">
+              还没配置 AI Key：截图和文本会照常保存，但不会自动生成标题/摘要/标签。
+            </span>
+            <button
+              type="button"
+              className="btn-primary px-2.5 py-1 text-[12px]"
+              onClick={() => useApp.getState().setPage("settings")}
+            >
+              去配置
+            </button>
+            <button
+              type="button"
+              className="btn-outline px-2.5 py-1 text-[12px]"
+              onClick={() => {
+                localStorage.setItem("yueyi-ai-banner", "1");
+                setKeyBannerHidden(true);
+              }}
+            >
+              先用本地模式
+            </button>
+          </div>
+        )}
         <div className="workspace-sheet mb-2.5 mr-2.5 flex min-h-0 flex-1 overflow-hidden rounded-2xl">
           <main
             ref={mainRef}
@@ -257,11 +318,16 @@ export default function App() {
             className="relative min-w-0 flex-1 overflow-y-auto overflow-x-hidden"
           >
             <div key={page} className="animate-page-enter min-h-full">
-              {page === "timeline" && <Timeline />}
-              {page === "collections" && <Collections />}
-              {page === "search" && <SearchQA />}
-              {page === "review" && <Review />}
-              {page === "settings" && <Settings />}
+              {page === "timeline" ? (
+                <Timeline />
+              ) : (
+                <Suspense fallback={<PageFallback />}>
+                  {page === "collections" && <Collections />}
+                  {page === "search" && <SearchQA />}
+                  {page === "review" && <Review />}
+                  {page === "settings" && <Settings />}
+                </Suspense>
+              )}
             </div>
           </main>
         </div>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { LayoutGrid, List, Plus, Pencil, Trash2, FolderOpen, Layers } from "lucide-react";
-import { useApp } from "@/stores/app";
+import { useAppPick } from "@/stores/app";
 import { collectionApi, memoryApi } from "@/services/api";
 import { fmtRelative, localImageUrl } from "@/utils/events";
 import { COLLECTION_COLORS } from "@/utils/palette";
@@ -9,7 +9,9 @@ import { Button, PageHeader } from "@/ui";
 import type { Collection, Memory } from "@/types";
 
 export default function Collections() {
-  const { collections, refreshAll, toast, setActiveCollection } = useApp();
+  const { collections, refreshAll, toast, setActiveCollection } = useAppPick(
+    "collections", "refreshAll", "toast", "setActiveCollection"
+  );
   const [view, setView] = useState<"grid" | "list">("grid");
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
@@ -259,7 +261,7 @@ export default function Collections() {
                     {c.name}
                   </h3>
                 )}
-                <span className="rounded-full bg-base-panel px-2 py-0.5 font-mono text-[11px] font-medium text-ink-dim">
+                <span className="rounded-full bg-base-panel px-2 py-0.5 font-mono text-[12px] font-medium text-ink-dim">
                   {c.count ?? 0} 条
                 </span>
               </div>
@@ -276,7 +278,7 @@ export default function Collections() {
                   />
                   <button
                     onClick={() => void saveEdit(c.id)}
-                    className="rounded bg-accent/15 px-2 py-1 text-[11px] text-accent"
+                    className="rounded bg-accent/15 px-2 py-1 text-[12px] text-accent"
                   >
                     保存
                   </button>
@@ -304,14 +306,14 @@ export default function Collections() {
                   </div>
                 ))}
                 {(c.count ?? 0) === 0 && (
-                  <div className="rounded-xl bg-base-panel/60 px-2.5 py-3 text-center text-[11px] text-ink-faint">
+                  <div className="rounded-xl bg-base-panel/60 px-2.5 py-3 text-center text-[12px] text-ink-faint">
                     空合集
                   </div>
                 )}
               </div>
 
               {/* 底部：最近更新时间 + hover 操作 */}
-              <div className="flex items-center justify-between pt-1 text-[11px] text-ink-faint">
+              <div className="flex items-center justify-between pt-1 text-[12px] text-ink-faint">
                 <span>更新于 {c.updated_at ? fmtRelative(c.updated_at) : "刚刚"}</span>
                 <div className="flex items-center gap-1.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                   <button
@@ -327,7 +329,7 @@ export default function Collections() {
                     <Pencil size={12} />
                   </button>
                   {confirmDelete === c.id ? (
-                    <span className="flex items-center gap-1 text-[10px]">
+                    <span className="flex items-center gap-1 text-[12px]">
                       <button className="text-danger" onClick={(e) => { e.stopPropagation(); void remove(c.id); }}>确认</button>
                       <button className="text-ink-faint" onClick={(e) => { e.stopPropagation(); setConfirmDelete(null); }}>取消</button>
                     </span>
@@ -378,10 +380,10 @@ export default function Collections() {
                   <div className="truncate text-[12px] text-ink-faint">{c.description}</div>
                 )}
               </div>
-              <span className="shrink-0 text-[11px] text-ink-faint">
+              <span className="shrink-0 text-[12px] text-ink-faint">
                 {c.updated_at ? fmtRelative(c.updated_at) : ""}
               </span>
-              <span className="shrink-0 font-mono text-[11px] text-ink-dim">{c.count ?? 0} 条记忆</span>
+              <span className="shrink-0 font-mono text-[12px] text-ink-dim">{c.count ?? 0} 条记忆</span>
 
               {/* 列表视图也提供编辑/删除（此前只能切回卡片视图操作） */}
               <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
@@ -399,7 +401,7 @@ export default function Collections() {
                   <Pencil size={12} />
                 </button>
                 {confirmDelete === c.id ? (
-                  <span className="flex items-center gap-1 text-[10px]">
+                  <span className="flex items-center gap-1 text-[12px]">
                     <button
                       className="rounded bg-danger px-1.5 py-0.5 text-white"
                       onClick={(e) => {

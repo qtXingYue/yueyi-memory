@@ -18,7 +18,7 @@ export default function MediaBlock({ memory }: { memory: Memory }) {
         }}
       />
       <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-black/45 to-transparent px-2.5 pb-1.5 pt-6">
-        <span className="rounded-md bg-black/40 px-1.5 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm">
+        <span className="rounded-md bg-black/40 px-1.5 py-0.5 text-[12px] font-medium text-white backdrop-blur-sm">
           {memory.type === "screenshot" ? "截屏" : "图片"}
         </span>
       </div>
@@ -39,13 +39,17 @@ export function TextCover({ memory, icon: Icon }: { memory: Memory; icon: Lucide
           : memory.kind === "pdf" || memory.type === "pdf" || memory.type === "document"
             ? "文档"
             : "速记";
+  const linkPath = (() => {
+    const rest = (memory.source_url || "").replace(/^https?:\/\/[^/]+/, "").replace(/^\/+/, "");
+    return rest.split(/[?#]/)[0];
+  })();
   const detail =
     memory.type === "link"
-      ? memory.source_url
+      ? linkPath || memory.summary
       : memory.file_path
-        ? memory.file_path.split(/[\/]/).pop() ?? ""
+        ? memory.file_path.split(/[\\/]/).pop() ?? ""
         : memory.content || memory.summary;
-  const snippet = (detail || memory.summary || "").trim().slice(0, 90);
+  const snippet = (detail || memory.summary || "").trim().slice(0, 160);
 
   return (
     <div className="text-cover -mx-4 -mt-4 mb-3 overflow-hidden">
@@ -53,11 +57,11 @@ export function TextCover({ memory, icon: Icon }: { memory: Memory; icon: Lucide
         <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/55 text-accent shadow-sm dark:bg-white/10">
           <Icon size={16} strokeWidth={1.8} />
         </span>
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-dim">
+        <span className="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-dim">
           {label}
         </span>
       </div>
-      <p className="mt-4 line-clamp-2 text-[13px] leading-relaxed text-ink-dim">
+      <p className="mt-3 line-clamp-3 text-[13px] leading-relaxed text-ink-dim">
         {snippet || memory.title}
       </p>
       <span className="pointer-events-none absolute -bottom-4 -right-1 text-6xl font-black leading-none text-ink/[0.045] dark:text-white/[0.045]">

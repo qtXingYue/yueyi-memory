@@ -44,7 +44,7 @@ html.quick-note-mode #root {
   border: 0;
   background: #fcfdff;
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
-  animation: qn-pop 0.34s cubic-bezier(0.2, 1.4, 0.32, 1) both;
+  animation: qn-pop 0.34s var(--ease-out) both;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 html[data-theme="night"] .qn-wrap {
@@ -133,7 +133,7 @@ html[data-theme="night"] .qn-wrap {
   gap: 4px;
   border-radius: 8px;
   padding: 3px 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: rgb(var(--c-ink-faint));
   transition: color 0.18s var(--ease-out), background-color 0.18s var(--ease-out);
@@ -181,7 +181,7 @@ html[data-theme="night"] .qn-wrap {
   justify-content: space-between;
   border-top: 1px solid rgb(var(--c-ink) / 0.06);
   padding: 0 14px;
-  font-size: 10px;
+  font-size: 12px;
   color: rgb(var(--c-ink-faint));
   letter-spacing: 0.02em;
   animation: qn-hint-in 0.4s 0.12s ease both;
@@ -202,12 +202,11 @@ html[data-theme="night"] .qn-wrap {
 body {
   background: rgb(var(--c-base));
   color: rgb(var(--c-ink));
-  font-family: "Inter Variable", "Inter", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei",
-    system-ui, sans-serif;
+  font-family: "Segoe UI Variable Display", "Segoe UI", "PingFang SC", "Microsoft YaHei UI",
+    "Microsoft YaHei", system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.6;
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -298,7 +297,7 @@ h3 {
   box-shadow: var(--elev-1);
   /* 长列表虚拟化：视口外的卡片跳过渲染，滚动到附近再绘制 */
   content-visibility: auto;
-  contain-intrinsic-size: auto 168px;
+  contain-intrinsic-size: auto 340px;
 }
 .memory-card-surface:hover {
   background: var(--card-hover-bg);
@@ -613,6 +612,11 @@ h3 {
 .chip-row::-webkit-scrollbar {
   display: none;
 }
+.chip.chip-clear {
+  border: 1px dashed rgba(var(--c-accent-rgb), 0.45);
+  background: rgba(var(--c-accent-rgb), 0.08);
+  color: rgb(var(--c-accent));
+}
 .chip {
   flex-shrink: 0;
   border-radius: 999px;
@@ -681,6 +685,27 @@ h3 {
 @keyframes pulseSoft {
   0%, 100% { opacity: 0.45; }
   50% { opacity: 1; }
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+.status-badge[data-status="processing"] {
+  color: rgb(var(--c-accent));
+  background: rgba(var(--c-accent-rgb), 0.12);
+}
+.status-badge[data-status="failed"] {
+  color: rgb(var(--c-warn));
+  background: rgb(var(--c-warn) / 0.12);
+}
+.status-badge[data-status="pending"] {
+  color: rgb(var(--c-ink-dim));
+  background: rgb(var(--c-panel2));
 }
 
 /* 卡片悬停操作条 */
@@ -795,7 +820,7 @@ kbd,
   border-radius: 6px;
   padding: 1px 6px;
   font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
-  font-size: 11px;
+  font-size: 12px;
   color: rgb(var(--c-ink-dim));
   background: rgb(var(--c-panel2));
   box-shadow: var(--ring-hair);
@@ -824,7 +849,7 @@ kbd,
 }
 .code-window-lang {
   font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
-  font-size: 11px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.45);
 }
 
@@ -916,15 +941,6 @@ html[data-density="compact"] .nav-item {
 }
 html[data-density="compact"] .timeline-group > .day-heading {
   margin-bottom: 6px;
-}
-
-/* 四个页面共用的唯一标题规格：22px / 700 / -0.01em */
-.page-title {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1.3;
-  color: rgb(var(--c-ink));
 }
 
 /* 键盘焦点：全站统一可见（此前只有 6 处按钮有 focus-visible） */
@@ -1027,7 +1043,7 @@ h3 {
     radial-gradient(28% 28% at 88% 2%, rgba(168, 150, 255, 0.22), transparent 70%),
     radial-gradient(38% 38% at 58% 46%, rgba(120, 170, 255, 0.16), transparent 72%),
     radial-gradient(40% 34% at 74% 100%, rgba(110, 205, 255, 0.18), transparent 72%);
-  filter: blur(72px);
+  filter: blur(44px);
   opacity: 0.85;
 }
 html[data-theme="night"] .app-shell::before {
@@ -1050,11 +1066,8 @@ html[data-theme="night"] .app-shell::before {
   background: var(--sheet-bg);
   border: 1px solid var(--sheet-border);
   box-shadow: var(--workspace-shadow);
-  backdrop-filter: blur(28px) saturate(1.3);
-  -webkit-backdrop-filter: blur(28px) saturate(1.3);
-}
-aside[aria-label="主导航"] {
-  width: 228px;
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
 }
 .workspace-sheet {
   margin: 0 12px 12px 0;
@@ -1062,8 +1075,8 @@ aside[aria-label="主导航"] {
   background: var(--sheet-bg);
   border: 1px solid var(--sheet-border);
   box-shadow: var(--workspace-shadow);
-  backdrop-filter: blur(28px) saturate(1.3);
-  -webkit-backdrop-filter: blur(28px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
   transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -1077,8 +1090,8 @@ aside[aria-label="主导航"] {
   border-radius: 14px;
   background: var(--card-bg);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 .topbar-search:hover {
   background: var(--card-hover-bg);
@@ -1099,7 +1112,7 @@ header button {
 /* ---- 按钮：蓝宝石渐变 / 玻璃白 ---- */
 .btn-primary {
   border-radius: 12px;
-  background: linear-gradient(135deg, #5b8cff 0%, #2f5bff 100%);
+  background: linear-gradient(135deg, #2f5bff 0%, #1e46d8 100%);
   color: #fff;
   box-shadow: 0 6px 16px rgba(47, 107, 255, 0.28);
 }
@@ -1201,7 +1214,7 @@ html[data-theme="night"] .seg-thumb {
   color: rgb(var(--c-ink));
 }
 .chip[data-active="true"] {
-  background: linear-gradient(135deg, #5b8cff 0%, #2f5bff 100%);
+  background: linear-gradient(135deg, #2f5bff 0%, #1e46d8 100%);
   border-color: transparent;
   color: #fff;
   box-shadow: 0 4px 12px rgba(47, 107, 255, 0.24);
@@ -1245,8 +1258,8 @@ aside[aria-label="记忆概览（窄栏）"] {
 .glass-deep {
   background: var(--glass-deep-bg);
   border-left: 1px solid var(--sheet-border);
-  backdrop-filter: blur(28px) saturate(1.2);
-  -webkit-backdrop-filter: blur(28px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.15);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
 }
 
 /* ---- 标签 / 字段：玻璃小胶囊 ---- */
@@ -1254,7 +1267,7 @@ aside[aria-label="记忆概览（窄栏）"] {
   border: 1px solid var(--card-border);
   border-radius: 999px;
   padding: 1px 8px;
-  font-size: 11px;
+  font-size: 12px;
   color: rgb(var(--c-ink-dim));
   background: var(--card-bg);
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
@@ -1270,7 +1283,7 @@ aside[aria-label="记忆概览（窄栏）"] {
   border: 1px solid var(--card-border);
   border-radius: 999px;
   padding: 1px 8px;
-  font-size: 11px;
+  font-size: 12px;
   color: rgb(var(--c-ink-dim));
   background: var(--card-bg);
 }
@@ -1282,7 +1295,7 @@ aside[aria-label="记忆概览（窄栏）"] {
   border-radius: 999px;
   border: 1px solid rgba(var(--c-accent-rgb), 0.18);
   background: rgba(var(--c-accent-rgb), 0.07);
-  font-size: 11px;
+  font-size: 12px;
   color: rgb(var(--c-ink-dim));
 }
 
@@ -1296,15 +1309,15 @@ html[data-theme="night"] .sidebar-surface {
   box-shadow: var(--workspace-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 .toolbar-sticky {
-  background: var(--toolbar-bg);
-  backdrop-filter: blur(20px) saturate(1.25);
-  -webkit-backdrop-filter: blur(20px) saturate(1.25);
+  background: var(--workspace-bg);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 .toolbar-sticky::after {
   display: none;
 }
 .memory-card-surface:hover {
-  transform: translateY(-2px);
+  transform: none;
 }
 
 /* ---- 日期头：不做吸顶、不加底色，直接跟随内容 ---- */
@@ -1348,8 +1361,8 @@ html[data-theme="night"] .sidebar-surface {
 .timeline-sub {
   margin-top: 8px;
   font-family: var(--font-mono, ui-monospace), monospace;
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  letter-spacing: 0.03em;
   color: rgb(var(--c-ink-faint));
 }
 .timeline-actions {
@@ -1363,7 +1376,7 @@ html[data-theme="night"] .sidebar-surface {
   border-radius: 999px;
   background: var(--card-bg);
   padding: 2px 9px;
-  font-size: 11px;
+  font-size: 12px;
   color: rgb(var(--c-ink-dim));
 }
 .board-back:hover {
@@ -1384,13 +1397,13 @@ html[data-theme="night"] .sidebar-surface {
   color: rgb(var(--c-ink));
 }
 .board-day > span {
-  font-size: 11px;
+  font-size: 12px;
   color: rgb(var(--c-ink-faint));
 }
 .board-count {
   margin-left: auto;
   font-family: var(--font-mono, ui-monospace), monospace;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.06em;
   color: rgb(var(--c-ink-faint));
 }

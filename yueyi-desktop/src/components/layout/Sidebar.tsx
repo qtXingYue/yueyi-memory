@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { useApp } from "@/stores/app";
+import { useApp, useAppPick } from "@/stores/app";
 import { collectionApi } from "@/services/api";
 import { COLLECTION_COLORS } from "@/utils/palette";
 import { Popover, TooltipBubble } from "@/ui";
@@ -43,7 +43,18 @@ export default function Sidebar() {
     refreshAll,
     sidebarCollapsed,
     stats,
-  } = useApp();
+  } = useAppPick(
+    "page",
+    "setPage",
+    "collections",
+    "activeCollection",
+    "setActiveCollection",
+    "setPaletteOpen",
+    "toast",
+    "refreshAll",
+    "sidebarCollapsed",
+    "stats"
+  );
 
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
@@ -301,7 +312,7 @@ export default function Sidebar() {
           }`}
         >
           <Settings2 size={16} strokeWidth={1.8} />
-          <TooltipBubble label="设置" kbd="Ctrl 4" />
+          <TooltipBubble label="设置" kbd="Ctrl 5" />
         </button>
       </aside>
     );
@@ -323,7 +334,7 @@ export default function Sidebar() {
             className="h-8 w-8 shrink-0 rounded-[10px] shadow-sm transition-transform duration-200 hover:scale-105"
           />
           <h1 className="truncate text-[15px] font-bold tracking-wide text-ink">月忆</h1>
-          <span className="ml-auto font-mono text-[10px] text-ink-faint">v{APP_VERSION}</span>
+          <span className="ml-auto font-mono text-[12px] text-ink-faint">v{APP_VERSION}</span>
         </div>
       </div>
 
@@ -361,8 +372,8 @@ export default function Sidebar() {
       <div className="mt-4 flex min-h-0 flex-1 flex-col border-t border-base-border/40 pt-3">
         <div className="mb-1.5 flex items-center justify-between px-2.5">
           <span className="flex items-baseline gap-1.5">
-            <span className="text-[11px] font-medium text-ink-faint">快速筛选</span>
-            <span className="font-mono text-[10px] text-ink-faint/70">{collections.length}</span>
+            <span className="text-[12px] font-medium text-ink-faint">快速筛选</span>
+            <span className="font-mono text-[12px] text-ink-faint/70">{collections.length}</span>
           </span>
           <div className="flex items-center gap-0.5">
             {collections.length > 5 && (
@@ -427,7 +438,7 @@ export default function Sidebar() {
               />
               <button
                 onClick={() => void createCollection()}
-                className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-semibold text-accent hover:bg-accent/10"
+                className="shrink-0 rounded-md px-1.5 py-0.5 text-[12px] font-semibold text-accent hover:bg-accent/10"
               >
                 创建
               </button>
@@ -461,7 +472,7 @@ export default function Sidebar() {
             >
               <ChevronLeft size={13} />
               <span className="flex-1 text-left text-[12px]">全部记忆</span>
-              <span className="font-mono text-[10px] text-ink-faint">{totalAll}</span>
+              <span className="font-mono text-[12px] text-ink-faint">{totalAll}</span>
             </button>
           )}
 
@@ -526,7 +537,7 @@ export default function Sidebar() {
                   <span className="min-w-0 flex-1 truncate text-[13px]">{c.name}</span>
                 )}
 
-                <span className="shrink-0 font-mono text-[11px] text-ink-faint transition-opacity group-hover:opacity-0 group-focus-within:opacity-0">
+                <span className="shrink-0 font-mono text-[12px] text-ink-faint transition-opacity group-hover:opacity-0 group-focus-within:opacity-0">
                   {c.count ?? 0}
                 </span>
 
@@ -546,7 +557,7 @@ export default function Sidebar() {
           })}
 
           {filteredCollections.length === 0 && collections.length > 0 && (
-            <div className="px-3 py-3 text-center text-[11px] text-ink-faint">没有匹配的合集</div>
+            <div className="px-3 py-3 text-center text-[12px] text-ink-faint">没有匹配的合集</div>
           )}
         </div>
       </div>
@@ -570,7 +581,7 @@ export default function Sidebar() {
           />
           <span className="text-[13px]">设置</span>
           <span
-            className="ml-auto flex items-center gap-1 font-mono text-[10px] text-ink-faint"
+            className="ml-auto flex items-center gap-1 font-mono text-[12px] text-ink-faint"
             title="所有数据保存在本机 SQLite"
           >
             <span className="h-1 w-1 rounded-full bg-[rgb(var(--c-success))]/70" />
@@ -626,7 +637,7 @@ export default function Sidebar() {
                     </button>
                   </div>
 
-                  <div className="mt-1 px-2.5 pb-1 text-[10px] text-ink-faint">颜色</div>
+                  <div className="mt-1 px-2.5 pb-1 text-[12px] text-ink-faint">颜色</div>
                   <div className="flex items-center gap-1.5 px-2.5 pb-1.5">
                     {COLLECTION_COLORS.map((color) => (
                       <button
@@ -651,20 +662,20 @@ export default function Sidebar() {
 
                   {confirmDeleteId === c.id ? (
                     <div className="flex items-center gap-1.5 px-1 pt-0.5">
-                      <span className="flex-1 px-1 text-[10px] text-danger">
+                      <span className="flex-1 px-1 text-[12px] text-danger">
                         删除后记忆移入待整理
                       </span>
                       <button
                         role="menuitem"
                         onClick={() => void removeCollection(c.id, c.name)}
-                        className="rounded-md bg-danger px-2 py-1 text-[11px] font-semibold text-white"
+                        className="rounded-md bg-danger px-2 py-1 text-[12px] font-semibold text-white"
                       >
                         确认
                       </button>
                       <button
                         role="menuitem"
                         onClick={() => setConfirmDeleteId(null)}
-                        className="rounded-md px-1.5 py-1 text-[11px] text-ink-faint hover:text-ink"
+                        className="rounded-md px-1.5 py-1 text-[12px] text-ink-faint hover:text-ink"
                       >
                         取消
                       </button>

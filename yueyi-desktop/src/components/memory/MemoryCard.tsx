@@ -110,6 +110,8 @@ function MemoryCard({
   const avatar = host ? siteAvatar(host) : null;
   const summaryText = snippet || memory.summary || memory.ai_summary || "";
   const bodyText = summaryText || (!isCode && memory.content ? memory.content.slice(0, 160) : "");
+  // 文本/剪贴板的内容已经出现在封面里，避免重复占高度；代码有 CodePreview
+  const showBody = Boolean(bodyText) && !isNote && !isCode;
   const recentlyCaptured =
     isNew || Date.now() - new Date(memory.created_at).getTime() < NEW_WINDOW_MS;
 
@@ -141,7 +143,7 @@ function MemoryCard({
           className="mb-2 flex max-w-full items-center gap-2 rounded-lg py-0.5 pr-2 text-left transition-colors hover:bg-accent/[0.07]"
         >
           <span
-            className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[11px] font-bold"
+            className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[12px] font-bold"
             style={{ background: avatar.bg, color: avatar.fg }}
           >
             {avatar.letter}
@@ -160,26 +162,31 @@ function MemoryCard({
           </span>
         )}
         {isDoc && (
-          <span className="shrink-0 rounded-md bg-base-panel2 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-ink-dim">
+          <span className="shrink-0 rounded-md bg-base-panel2 px-1.5 py-0.5 font-mono text-[12px] font-semibold text-ink-dim">
             {docExt}
           </span>
         )}
-        <h3
-          onClick={(e) => {
-            if (isLink && cardUrl) openLink(e);
-          }}
-          className={`line-clamp-2 text-[15px] font-semibold leading-snug text-ink transition-colors duration-200 group-hover:text-accent ${
-            isLink && cardUrl ? "cursor-pointer hover:underline hover:underline-offset-2" : ""
-          }`}
-          title={isLink && cardUrl ? `点击在浏览器中打开: ${cardUrl}` : undefined}
-        >
-          {highlight(memory.title || "未命名记忆", highlightTerm)}
+        <h3 className="min-w-0">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isLink && cardUrl) openLink(e);
+              else handleClick();
+            }}
+            className={`line-clamp-2 w-full text-left text-[15px] font-semibold leading-snug text-ink outline-none transition-colors duration-200 group-hover:text-accent focus-visible:underline focus-visible:underline-offset-2 ${
+              isLink && cardUrl ? "cursor-pointer hover:underline hover:underline-offset-2" : ""
+            }`}
+            title={isLink && cardUrl ? `点击在浏览器中打开: ${cardUrl}` : undefined}
+          >
+            {highlight(memory.title || "未命名记忆", highlightTerm)}
+          </button>
         </h3>
         {recentlyCaptured && <span className="badge-moon shrink-0">新捕获</span>}
       </div>
 
       {/* 摘要 / 正文预览：笔记类带 2px 类型色细条 */}
-      {bodyText && (
+      {showBody && (
         <div className={`mt-1.5 ${isNote ? "relative pl-3" : ""}`}>
           {isNote && (
             <span className="absolute bottom-0.5 left-0 top-0.5 w-[2px] rounded-full bg-accent/40" />
@@ -191,13 +198,6 @@ function MemoryCard({
       )}
 
       {isCode && memory.content && <CodePreview content={memory.content} />}
-
-      {/* 文档路径说明 */}
-      {isDoc && memory.file_path && (
-        <div className="mt-1 truncate font-mono text-[12px] text-ink-faint">
-          {memory.file_path.split(/[\\/]/).pop()}
-        </div>
-      )}
 
       <FieldChips fields={memory.fields ?? []} />
       <MetaRow memory={memory} score={score} />

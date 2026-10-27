@@ -12,11 +12,11 @@ const AI_STATUS_LABEL: Record<Memory["ai_status"], string> = {
 export default function MetaRow({ memory, score }: { memory: Memory; score?: number }) {
   return (
     <div className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[12px] text-ink-faint">
-      <span
-        className="status-dot"
-        data-status={memory.ai_status}
-        title={AI_STATUS_LABEL[memory.ai_status]}
-      />
+      {memory.ai_status !== "done" && (
+        <span className="status-badge" data-status={memory.ai_status}>
+          {AI_STATUS_LABEL[memory.ai_status]}
+        </span>
+      )}
       {score != null && (
         <span className="font-mono font-semibold text-accent">{(score * 100).toFixed(0)}%</span>
       )}
@@ -24,7 +24,7 @@ export default function MetaRow({ memory, score }: { memory: Memory; score?: num
       <span aria-hidden>·</span>
       <span>{fmtRelative(memory.created_at)}</span>
       {memory.collection_name && (
-        <span className="flex items-center gap-1.5 rounded-md bg-base-panel2 px-2 py-0.5 text-ink-dim">
+        <span className="flex items-center gap-1.5 text-ink-dim">
           <span
             className="h-1.5 w-1.5 rounded-full"
             style={{ background: memory.collection_color ?? "rgb(var(--c-accent))" }}

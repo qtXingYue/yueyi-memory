@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Camera, PenLine, ClipboardList, AppWindow, Crop } from "lucide-react";
-import { useApp } from "@/stores/app";
+import { useAppPick } from "@/stores/app";
 import { captureApi, memoryApi } from "@/services/api";
 import { openDrawer } from "@/utils/events";
 
@@ -9,7 +9,7 @@ import { openDrawer } from "@/utils/events";
  * 从 Timeline 抽出，页面只负责列表与筛选；采集逻辑自包含。
  */
 export default function CaptureBar({ onRegionCapture }: { onRegionCapture: () => void }) {
-  const { toast, refreshAll } = useApp();
+  const { toast, refreshAll } = useAppPick("toast", "refreshAll");
   const [text, setText] = useState("");
 
   const save = async () => {

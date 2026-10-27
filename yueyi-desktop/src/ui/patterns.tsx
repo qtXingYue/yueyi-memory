@@ -91,7 +91,7 @@ export function StatTile({ value, label }: { value: ReactNode; label: string }) 
   return (
     <div className="rounded-xl bg-base-panel py-2.5 text-center">
       <div className="font-mono text-[18px] font-bold text-ink">{value}</div>
-      <div className="mt-0.5 text-[11px] text-ink-faint">{label}</div>
+      <div className="mt-0.5 text-[12px] text-ink-faint">{label}</div>
     </div>
   );
 }

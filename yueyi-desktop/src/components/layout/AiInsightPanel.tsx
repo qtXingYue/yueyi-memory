@@ -1,5 +1,5 @@
 import { PanelRightOpen } from "lucide-react";
-import { useApp } from "@/stores/app";
+import { useAppPick } from "@/stores/app";
 import { openDrawer } from "@/utils/events";
 import { Spark } from "@/components/Sparkline";
 
@@ -7,7 +7,7 @@ function RailStat({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex w-full flex-col items-center leading-none">
       <span className="font-mono text-[14px] font-bold text-ink">{value}</span>
-      <span className="mt-1 text-[10px] text-ink-faint">{label}</span>
+      <span className="mt-1 text-[12px] text-ink-faint">{label}</span>
     </div>
   );
 }
@@ -22,7 +22,16 @@ export default function AiInsightPanel() {
     cycleInsight,
     activeTag,
     setActiveTag,
-  } = useApp();
+  } = useAppPick(
+    "memories",
+    "stats",
+    "hotTags",
+    "recent",
+    "insightMode",
+    "cycleInsight",
+    "activeTag",
+    "setActiveTag"
+  );
 
   const totalCount = memories.length;
   const screenshotCount = memories.filter(
@@ -65,7 +74,7 @@ export default function AiInsightPanel() {
       <div className="shrink-0 rounded-2xl bg-base-panel2/80 p-4">
         <div className="mb-3 flex items-center justify-between">
           <span className="text-[12px] font-semibold text-ink">记忆概览</span>
-          <span className="text-[11px] text-ink-faint">
+          <span className="text-[12px] text-ink-faint">
             今日 +{stats?.total ?? 0} · 14天趋势
           </span>
         </div>
@@ -75,19 +84,19 @@ export default function AiInsightPanel() {
             <div className="font-mono text-[18px] font-bold text-ink">
               {totalCount}
             </div>
-            <div className="mt-0.5 text-[10px] text-ink-faint">总计</div>
+            <div className="mt-0.5 text-[12px] text-ink-faint">总计</div>
           </div>
           <div className="rounded-xl bg-base-panel py-2.5">
             <div className="font-mono text-[18px] font-bold text-ink">
               {screenshotCount}
             </div>
-            <div className="mt-0.5 text-[10px] text-ink-faint">截图</div>
+            <div className="mt-0.5 text-[12px] text-ink-faint">截图</div>
           </div>
           <div className="rounded-xl bg-base-panel py-2.5">
             <div className="font-mono text-[18px] font-bold text-ink">
               {linkCount}
             </div>
-            <div className="mt-0.5 text-[10px] text-ink-faint">网页关联</div>
+            <div className="mt-0.5 text-[12px] text-ink-faint">网页关联</div>
           </div>
         </div>
 
@@ -103,7 +112,7 @@ export default function AiInsightPanel() {
           {activeTag && (
             <button
               onClick={() => setActiveTag(null)}
-              className="text-[11px] text-accent hover:underline"
+              className="text-[12px] text-accent hover:underline"
             >
               清除筛选
             </button>
@@ -152,7 +161,7 @@ export default function AiInsightPanel() {
               <span className="flex-1 truncate text-[12px] text-ink-dim transition-colors group-hover:text-ink">
                 {m.title || "未命名记忆"}
               </span>
-              <span className="shrink-0 font-mono text-[10px] text-ink-faint">
+              <span className="shrink-0 font-mono text-[12px] text-ink-faint">
                 {new Date(m.created_at).toLocaleTimeString("zh-CN", {
                   hour: "2-digit",
                   minute: "2-digit",

@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "@fontsource-variable/inter";
+import ErrorBoundary from "./components/ErrorBoundary";
 import "./ui/tokens.css";
 import "./styles/globals.css";
 
@@ -22,15 +22,15 @@ window.addEventListener("unhandledrejection", (e) => {
 });
 
 async function bootstrap() {
-  await report(`bootstrap start, href=${location.href}`);
+  void report(`bootstrap start, href=${location.href}`);
 
   let isQuickNote = false;
   try {
     const { getCurrentWindow } = await import("@tauri-apps/api/window");
     isQuickNote = getCurrentWindow().label === "quick-note";
-    await report(`window label resolved, quickNote=${isQuickNote}`);
+    void report(`window label resolved, quickNote=${isQuickNote}`);
   } catch (e) {
-    await report(`getCurrentWindow failed: ${String(e)}`);
+    void report(`getCurrentWindow failed: ${String(e)}`);
   }
 
   let App: React.ComponentType;
@@ -38,9 +38,9 @@ async function bootstrap() {
     App = !isQuickNote
       ? (await import("./App")).default
       : (await import("./components/QuickNote")).default;
-    await report(`module imported ok, quickNote=${isQuickNote}`);
+    void report(`module imported ok, quickNote=${isQuickNote}`);
   } catch (e) {
-    await report(`module import FAILED: ${String(e)}`);
+    void report(`module import FAILED: ${String(e)}`);
     throw e;
   }
 
@@ -50,11 +50,13 @@ async function bootstrap() {
   }
 
   const root = document.getElementById("root");
-  await report(`root element: ${root ? "found" : "MISSING"}`);
+  void report(`root element: ${root ? "found" : "MISSING"}`);
 
   ReactDOM.createRoot(root!).render(
     <React.StrictMode>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </React.StrictMode>
   );
 

@@ -14,7 +14,7 @@
 
   --c-ink: 15 27 48;
   --c-ink-dim: 78 96 126;
-  --c-ink-faint: 122 140 168;
+  --c-ink-faint: 92 109 136;
 
   --c-accent: 45 104 255;
   --c-accent-rgb: 45, 104, 255;
@@ -54,8 +54,6 @@
 
   --glass-bg: rgba(255, 255, 255, 0.55);
   --glass-deep-bg: rgba(255, 255, 255, 0.86);
-  --card-bg: rgba(255, 255, 255, 0.55);
-  --card-hover-bg: rgba(255, 255, 255, 0.76);
   --hover-tint: rgba(45, 104, 255, 0.07);
   --active-tint: rgba(45, 104, 255, 0.12);
 
@@ -72,8 +70,8 @@
   --code-fg: #94e2b8;
 
   /* ---- 字号阶梯（页面只允许这 8 级 + 相对 em） ---- */
-  --text-micro: 10px;      /* 版本号、极小角标 */
-  --text-caption: 11px;    /* 标签、辅助说明 */
+  --text-micro: 12px;      /* 辅助信息下限 */
+  --text-caption: 12px;    /* 标签、辅助说明 */
   --text-meta: 12px;       /* 元信息 */
   --text-body: 13px;       /* 正文 */
   --text-body-lg: 14px;    /* 强调正文 */
@@ -107,7 +105,7 @@
   --dur-slow: 260ms;
   --dur-slower: 360ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.2, 1.2, 0.4, 1);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
 }
 
@@ -121,7 +119,7 @@ html[data-theme="night"] {
 
   --c-ink: 232 240 255;
   --c-ink-dim: 164 180 208;
-  --c-ink-faint: 112 130 160;
+  --c-ink-faint: 138 154 182;
 
   --c-accent: 122 168 255;
   --c-accent-rgb: 122, 168, 255;
@@ -157,8 +155,6 @@ html[data-theme="night"] {
 
   --glass-bg: rgba(18, 28, 48, 0.55);
   --glass-deep-bg: rgba(14, 22, 40, 0.88);
-  --card-bg: rgba(255, 255, 255, 0.055);
-  --card-hover-bg: rgba(255, 255, 255, 0.09);
   --hover-tint: rgba(122, 168, 255, 0.10);
   --active-tint: rgba(122, 168, 255, 0.16);
 

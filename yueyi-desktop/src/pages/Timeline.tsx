@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import {
   Plus,
@@ -8,18 +7,16 @@ import {
   FolderInput,
   Trash2,
   X,
-  Crop,
   Hash,
-  Check,
-  RotateCcw,
+  MoonStar,
 } from "lucide-react";
 import { useApp, useAppPick } from "@/stores/app";
 import MemoryCard from "@/components/memory/MemoryCard";
+import RegionCaptureOverlay, { type DragBox } from "@/components/timeline/RegionCaptureOverlay";
 import CaptureBar from "@/components/timeline/CaptureBar";
 import Segmented from "@/components/Segmented";
 import { captureApi, memoryApi, collectionApi } from "@/services/api";
 import { openDrawer, localImageUrl } from "@/utils/events";
-import { topmostOverlay } from "@/hooks/useOverlay";
 
 const RANGES = [
   { id: "all", label: "全部" },
@@ -41,13 +38,6 @@ interface RegionSession {
   previewUrl: string;
   imgWidth: number;
   imgHeight: number;
-}
-
-interface DragBox {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
 }
 
 export default function Timeline() {
@@ -94,9 +84,8 @@ export default function Timeline() {
 
   // P1-1：可视化区域框选状态（冻结屏幕快照 + 鼠标拖拽选区）
   const [regionSession, setRegionSession] = useState<RegionSession | null>(null);
-  const [dragBox, setDragBox] = useState<DragBox | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [committingRegion, setCommittingRegion] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(60);
 
   // Ctrl+N 已提升到 App 全局处理（任何页面都可用），此处不再重复监听
 
@@ -122,6 +111,19 @@ export default function Timeline() {
   const [collBusy, setCollBusy] = useState<"smart" | "summary" | null>(null);
   const shotCount = memories.filter((m) => m.type === "screenshot" || m.type === "image").length;
   const webCount = memories.filter((m) => m.type === "link" || Boolean(m.source_url)).length;
+  const queueCount = useMemo(
+    () => memories.filter((m) => m.ai_status === "processing" || m.ai_status === "pending").length,
+    [memories]
+  );
+  const phase = (() => {
+    const h = new Date().getHours();
+    if (h < 5) return "深夜";
+    if (h < 9) return "清晨";
+    if (h < 12) return "上午";
+    if (h < 18) return "白天";
+    if (h < 23) return "夜晚";
+    return "深夜";
+  })();
 
   const smartFill = async () => {
     if (activeCollection === null || collBusy) return;
@@ -155,8 +157,6 @@ export default function Timeline() {
   const startVisualRegionCapture = async () => {
     try {
       const res = await captureApi.prepareRegionCapture();
-      setDragBox(null);
-      setIsDragging(false);
       setRegionSession({
         previewUrl: localImageUrl(res.preview_path),
         imgWidth: res.width,
@@ -169,8 +169,6 @@ export default function Timeline() {
 
   const cancelVisualRegionCapture = async () => {
     setRegionSession(null);
-    setDragBox(null);
-    setIsDragging(false);
     try {
       await captureApi.cancelRegionCapture();
     } catch {
@@ -178,7 +176,7 @@ export default function Timeline() {
     }
   };
 
-  const confirmVisualRegionCapture = async () => {
+  const confirmVisualRegionCapture = async (box: DragBox | null) => {
     if (!regionSession || committingRegion) return;
     const vw = Math.max(1, window.innerWidth);
     const vh = Math.max(1, window.innerHeight);
@@ -190,11 +188,11 @@ export default function Timeline() {
     let cropW = regionSession.imgWidth;
     let cropH = regionSession.imgHeight;
 
-    if (dragBox) {
-      const left = Math.min(dragBox.x1, dragBox.x2);
-      const top = Math.min(dragBox.y1, dragBox.y2);
-      const w = Math.abs(dragBox.x2 - dragBox.x1);
-      const h = Math.abs(dragBox.y2 - dragBox.y1);
+    if (box) {
+      const left = Math.min(box.x1, box.x2);
+      const top = Math.min(box.y1, box.y2);
+      const w = Math.abs(box.x2 - box.x1);
+      const h = Math.abs(box.y2 - box.y1);
       if (w >= 8 && h >= 8) {
         cropX = Math.max(0, Math.round(left * scaleX));
         cropY = Math.max(0, Math.round(top * scaleY));
@@ -206,7 +204,6 @@ export default function Timeline() {
     setCommittingRegion(true);
     try {
       setRegionSession(null);
-      setDragBox(null);
       const m = await captureApi.commitRegionCapture(cropX, cropY, cropW, cropH);
       openDrawer(m.id);
       await refreshAll();
@@ -217,34 +214,27 @@ export default function Timeline() {
     }
   };
 
-  useEffect(() => {
-    if (!regionSession) return;
-    const onKey = (e: KeyboardEvent) => {
-      // Esc 走浮层栈：抽屉/命令面板叠在上面时不该把框选一起关掉
-      if (e.key === "Escape") {
-        if (topmostOverlay(useApp.getState()) !== "region") return;
-        e.preventDefault();
-        void cancelVisualRegionCapture();
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        void confirmVisualRegionCapture();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [regionSession, dragBox]);
-
   // 把框选覆盖层登记进浮层栈
   useEffect(() => {
     setRegionCaptureOpen(regionSession !== null);
     return () => setRegionCaptureOpen(false);
   }, [regionSession, setRegionCaptureOpen]);
 
-  const toggleSelect = (id: number) => {
+  const toggleSelect = useCallback((id: number) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
-  };
+  }, []);
+
+  // 筛选变化回到首批，避免在旧筛选的滚动位置渲染过多卡片
+  useEffect(() => {
+    setVisibleCount(60);
+  }, [activeTag, activeType, activeCollection, timeRange]);
+
+  const visibleMemories = useMemo(
+    () => filteredMemories.slice(0, visibleCount),
+    [filteredMemories, visibleCount]
+  );
 
   const selectAll = () => {
     if (selectedIds.length === filteredMemories.length) {
@@ -307,7 +297,15 @@ export default function Timeline() {
             )}
           </div>
           <p className="timeline-sub">
+            <span className="inline-flex items-center gap-1 text-ink-dim" title="当前时段">
+              <MoonStar size={12} strokeWidth={1.7} />
+              {phase}
+            </span>
+            <span className="mx-1.5">·</span>
             今日 +{stats?.total ?? 0} · 共 {memories.length} 条 · 截图 {shotCount} · 网页 {webCount}
+            {queueCount > 0 && (
+              <span className="ml-2 text-accent">· {queueCount} 条整理中</span>
+            )}
           </p>
         </div>
 
@@ -333,7 +331,7 @@ export default function Timeline() {
         <div className="glass mb-3 rounded-2xl p-4">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
-              <div className="text-[11px] uppercase tracking-wider text-ink-faint">
+              <div className="text-[12px] uppercase tracking-wider text-ink-faint">
                 合集{activeCollectionObj.goal ? ` · ${activeCollectionObj.goal}` : ""}
               </div>
               <p className="mt-1.5 whitespace-pre-wrap text-[13px] leading-relaxed text-ink-dim">
@@ -341,7 +339,7 @@ export default function Timeline() {
                   "还没有合集摘要。先「智能整理」把历史记忆关联进来，再生成摘要。"}
               </p>
               {activeCollectionObj.summary_at && (
-                <div className="mt-1 text-[11px] text-ink-faint">
+                <div className="mt-1 text-[12px] text-ink-faint">
                   摘要更新于 {activeCollectionObj.summary_at}
                 </div>
               )}
@@ -398,6 +396,20 @@ export default function Timeline() {
             {tf.label}
           </button>
         ))}
+        {(activeTag || activeType !== "all" || activeCollection !== null || timeRange !== "all") && (
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTag(null);
+              setActiveType("all");
+              setTimeRange("all");
+              useApp.getState().setActiveCollection(null);
+            }}
+            className="chip chip-clear"
+          >
+            清空筛选 <X size={12} />
+          </button>
+        )}
       </div>
 
       {/* 当前激活标签筛选提示 */}
@@ -465,164 +477,14 @@ export default function Timeline() {
         </div>
       )}
 
-      {/* P1-1：可视化屏幕区域框选覆盖层（全屏冻结桌面快照 + 自由拖拽拉框 + 像素尺寸实时回显） */}
-      {regionSession &&
-        createPortal(
-          (() => {
-            const vw = Math.max(1, window.innerWidth);
-            const vh = Math.max(1, window.innerHeight);
-            const scaleX = regionSession.imgWidth / vw;
-            const scaleY = regionSession.imgHeight / vh;
-
-            const hasBox =
-              dragBox !== null &&
-              Math.abs(dragBox.x2 - dragBox.x1) >= 6 &&
-              Math.abs(dragBox.y2 - dragBox.y1) >= 6;
-
-            const left = dragBox ? Math.min(dragBox.x1, dragBox.x2) : 0;
-            const top = dragBox ? Math.min(dragBox.y1, dragBox.y2) : 0;
-            const width = dragBox ? Math.abs(dragBox.x2 - dragBox.x1) : 0;
-            const height = dragBox ? Math.abs(dragBox.y2 - dragBox.y1) : 0;
-
-            const realW = Math.max(1, Math.round(width * scaleX));
-            const realH = Math.max(1, Math.round(height * scaleY));
-            const realX = Math.max(0, Math.round(left * scaleX));
-            const realY = Math.max(0, Math.round(top * scaleY));
-
-            const toolbarTop =
-              top + height + 52 < vh ? top + height + 10 : Math.max(12, top - 46);
-            const toolbarLeft = Math.min(
-              Math.max(12, left + width - 240),
-              Math.max(12, vw - 252)
-            );
-
-            return (
-              <div
-                onMouseDown={(e) => {
-                  if (e.button === 2) {
-                    e.preventDefault();
-                    void cancelVisualRegionCapture();
-                    return;
-                  }
-                  if (e.button !== 0) return;
-                  const target = e.target as HTMLElement;
-                  if (target.closest("button")) return;
-                  setIsDragging(true);
-                  setDragBox({
-                    x1: e.clientX,
-                    y1: e.clientY,
-                    x2: e.clientX,
-                    y2: e.clientY,
-                  });
-                }}
-                onMouseMove={(e) => {
-                  if (!isDragging) return;
-                  setDragBox((prev) =>
-                    prev ? { ...prev, x2: e.clientX, y2: e.clientY } : null
-                  );
-                }}
-                onMouseUp={() => {
-                  if (isDragging) setIsDragging(false);
-                }}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  void cancelVisualRegionCapture();
-                }}
-                onDoubleClick={() => void confirmVisualRegionCapture()}
-                className="fixed inset-0 z-[200] cursor-crosshair select-none overflow-hidden bg-black"
-              >
-                {/* 冻结的屏幕原始图像 */}
-                <img
-                  src={regionSession.previewUrl}
-                  alt="屏幕快照"
-                  draggable={false}
-                  className="pointer-events-none h-full w-full object-fill"
-                />
-
-                {/* 未框选时的半透明暗色遮罩 */}
-                {!hasBox && <div className="pointer-events-none absolute inset-0 bg-black/45" />}
-
-                {/* 顶部悬浮操作指引胶囊 */}
-                <div className="pointer-events-none fixed left-1/2 top-5 z-20 flex -translate-x-1/2 items-center gap-3 rounded-full bg-black/75 px-4 py-2 text-[13px] font-medium text-white shadow-lg backdrop-blur-md">
-                  <Crop size={14} className="text-[#60A5FA]" />
-                  <span>按住左键拖拽框选区域 · 双击或按 Enter 完成截取 · 右键或按 Esc 取消</span>
-                </div>
-
-                {/* 选区高亮框（通过超大外阴影实现选区外压暗、选区内 100% 清晰透亮） */}
-                {hasBox && (
-                  <div
-                    style={{
-                      left: `${left}px`,
-                      top: `${top}px`,
-                      width: `${width}px`,
-                      height: `${height}px`,
-                      boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.52)",
-                    }}
-                    className="pointer-events-none absolute border-2 border-[#3B82F6]"
-                  >
-                    {/* 四个角控制柄装饰 */}
-                    <span className="absolute -left-1.5 -top-1.5 h-2.5 w-2.5 rounded-xs bg-white ring-2 ring-[#3B82F6]" />
-                    <span className="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-xs bg-white ring-2 ring-[#3B82F6]" />
-                    <span className="absolute -bottom-1.5 -left-1.5 h-2.5 w-2.5 rounded-xs bg-white ring-2 ring-[#3B82F6]" />
-                    <span className="absolute -bottom-1.5 -right-1.5 h-2.5 w-2.5 rounded-xs bg-white ring-2 ring-[#3B82F6]" />
-
-                    {/* 实时像素尺寸与坐标标尺 */}
-                    <div
-                      className="absolute left-0 flex items-center gap-2 whitespace-nowrap rounded-md bg-black/80 px-2.5 py-1 font-mono text-[11px] text-white shadow-md"
-                      style={{ top: top > 32 ? "-28px" : "6px" }}
-                    >
-                      <span className="font-semibold text-[#60A5FA]">
-                        {realW} × {realH} px
-                      </span>
-                      <span className="text-white/60">
-                        ({realX}, {realY})
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* 松开鼠标后悬浮确认工具栏 */}
-                {hasBox && !isDragging && (
-                  <div
-                    style={{
-                      left: `${toolbarLeft}px`,
-                      top: `${toolbarTop}px`,
-                    }}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    className="fixed z-30 flex items-center gap-1.5 rounded-xl bg-[#141720]/95 p-1.5 text-white shadow-2xl ring-1 ring-white/15 backdrop-blur-md"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setDragBox(null)}
-                      className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12px] text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                    >
-                      <RotateCcw size={13} />
-                      <span>重选</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void cancelVisualRegionCapture()}
-                      className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12px] text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                    >
-                      <X size={13.5} />
-                      <span>取消</span>
-                    </button>
-                    <button
-                      type="button"
-                      disabled={committingRegion}
-                      onClick={() => void confirmVisualRegionCapture()}
-                      className="flex items-center gap-1 rounded-lg bg-[#2563EB] px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-[#1D4ED8]"
-                    >
-                      <Check size={13.5} />
-                      <span>完成截图</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })(),
-          document.body
-        )}
+      {regionSession && (
+        <RegionCaptureOverlay
+          session={regionSession}
+          committing={committingRegion}
+          onCancel={() => void cancelVisualRegionCapture()}
+          onCommit={(box) => void confirmVisualRegionCapture(box)}
+        />
+      )}
 
       {/* 空状态 */}
       {filteredMemories.length === 0 && !loading && (
@@ -631,10 +493,12 @@ export default function Timeline() {
             <Inbox size={24} strokeWidth={1.6} className="text-ink-dim" />
           </div>
           <h3 className="text-[15px] font-semibold text-ink">
-            当前筛选下还没有记忆
+            {memories.length === 0 ? "还没有记忆" : "当前筛选下没有匹配"}
           </h3>
           <p className="mt-1.5 text-[13px] text-ink-faint">
-            按下 <kbd>Alt + Shift + S</kbd> 捕获当前屏幕，或在上方书写卡直接记录
+            {memories.length === 0
+              ? "按下 Alt + Shift + S 捕获当前屏幕，或在上方书写卡记录第一条"
+              : "换个关键词、标签或时间范围试试"}
           </p>
           {(activeCollection !== null ||
             activeTag !== null ||
@@ -656,7 +520,7 @@ export default function Timeline() {
       {/* 记忆卡片墙：按时间倒序，不分组，避免每天只有一张卡时右侧留洞 */}
       {filteredMemories.length > 0 && (
         <div className="memory-grid">
-          {filteredMemories.map((m, i) => (
+          {visibleMemories.map((m, i) => (
             <MemoryCard
               key={m.id}
               memory={m}
@@ -670,6 +534,18 @@ export default function Timeline() {
               onToggleSelect={toggleSelect}
             />
           ))}
+        </div>
+      )}
+
+      {visibleMemories.length < filteredMemories.length && (
+        <div className="mt-2 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((n) => n + 60)}
+            className="btn-outline px-4 py-2 text-[12px]"
+          >
+            加载更多（还有 {filteredMemories.length - visibleMemories.length} 条）
+          </button>
         </div>
       )}
 

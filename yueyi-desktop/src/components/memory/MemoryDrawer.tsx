@@ -5,7 +5,7 @@ import {
   CalendarPlus, FolderOpen, Download,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
-import { useApp } from "@/stores/app";
+import { useAppPick } from "@/stores/app";
 import { memoryApi } from "@/services/api";
 import { onOpenDrawer, fmtDateTime, localImageUrl, openExternalUrl, sourceLabel } from "@/utils/events";
 import { memoryLinkUrl } from "@/utils/site";
@@ -15,7 +15,8 @@ import Linkify from "@/components/memory/Linkify";
 import type { Collection, Memory } from "@/types";
 
 export default function MemoryDrawer() {
-  const { drawerMemoryId, closeDrawer, collections, memories, refreshAll, toast, openDrawer } = useApp();
+  const { drawerMemoryId, closeDrawer, collections, memories, refreshAll, toast, openDrawer } =
+    useAppPick("drawerMemoryId", "closeDrawer", "collections", "memories", "refreshAll", "toast", "openDrawer");
   const [memory, setMemory] = useState<Memory | null>(null);
   const [related, setRelated] = useState<Memory[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -285,7 +286,7 @@ export default function MemoryDrawer() {
                         <ExternalLink size={14} />
                       </div>
                       <span className="flex-1 truncate font-mono text-[12px]">{drawerUrl}</span>
-                      <span className="shrink-0 rounded-lg bg-accent/20 px-2.5 py-1 text-[11px] font-semibold text-accent transition-colors group-hover:bg-accent group-hover:text-white">
+                      <span className="shrink-0 rounded-lg bg-accent/20 px-2.5 py-1 text-[12px] font-semibold text-accent transition-colors group-hover:bg-accent group-hover:text-white">
                         打开网页 ↗
                       </span>
                     </button>
@@ -299,7 +300,7 @@ export default function MemoryDrawer() {
                   <Loader2 size={16} className="animate-spin text-accent shrink-0" />
                   <div className="flex-1">
                     <div className="text-[13px] font-medium">AI 正在深度解析画面…</div>
-                    <div className="text-[11px] text-ink-dim">正在提取文字并智能生成标题、摘要与标签分类</div>
+                    <div className="text-[12px] text-ink-dim">正在提取文字并智能生成标题、摘要与标签分类</div>
                   </div>
                 </div>
               )}
@@ -311,7 +312,7 @@ export default function MemoryDrawer() {
                     <Sparkles size={16} className="shrink-0" />
                     <div>
                       <div className="text-[13px] font-medium">AI 整理未完成</div>
-                      <div className="text-[11px] text-ink-dim">截图已完整保存在本地，可随时点击重试</div>
+                      <div className="text-[12px] text-ink-dim">截图已完整保存在本地，可随时点击重试</div>
                     </div>
                   </div>
                   <button
@@ -367,7 +368,7 @@ export default function MemoryDrawer() {
                           </span>
                           {f.key === "url" && (
                             <button
-                              className="shrink-0 text-[11px] font-medium text-accent hover:underline"
+                              className="shrink-0 text-[12px] font-medium text-accent hover:underline"
                               onClick={() => void openExternalUrl(f.value)}
                             >
                               打开
@@ -375,7 +376,7 @@ export default function MemoryDrawer() {
                           )}
                           {f.key === "file_path" && (
                             <button
-                              className="flex shrink-0 items-center gap-0.5 text-[11px] font-medium text-accent hover:underline"
+                              className="flex shrink-0 items-center gap-0.5 text-[12px] font-medium text-accent hover:underline"
                               onClick={() => void invoke("reveal_path", { path: f.value })}
                             >
                               <FolderOpen size={10} /> 定位
@@ -383,7 +384,7 @@ export default function MemoryDrawer() {
                           )}
                           {(f.key === "deadline" || f.key === "event_start") && (
                             <button
-                              className="flex shrink-0 items-center gap-0.5 text-[11px] font-medium text-accent hover:underline"
+                              className="flex shrink-0 items-center gap-0.5 text-[12px] font-medium text-accent hover:underline"
                               onClick={async () => {
                                 try {
                                   const path = await invoke<string>("export_ics", {
@@ -565,7 +566,7 @@ export default function MemoryDrawer() {
                       >
                         <Sparkles size={11} className="text-violet" />
                         <span className="flex-1 truncate text-[13px] text-ink-dim">{r.title}</span>
-                        <span className="text-[10px] text-ink-faint">
+                        <span className="text-[12px] text-ink-faint">
                           {new Date(r.created_at).toLocaleDateString("zh-CN")}
                         </span>
                       </button>
@@ -623,7 +624,7 @@ export default function MemoryDrawer() {
             <div className="flex-1" />
             {showDeleteConfirm ? (
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-ink-faint">确认删除？</span>
+                <span className="text-[12px] text-ink-faint">确认删除？</span>
                 <button className="btn-danger" onClick={() => void remove()}>确认</button>
                 <button className="btn-ghost" onClick={() => setShowDeleteConfirm(false)}>取消</button>
               </div>

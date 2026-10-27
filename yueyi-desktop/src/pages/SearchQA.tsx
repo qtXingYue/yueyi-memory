@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Search, Send, Sparkles, Loader2, BookOpen, KeyRound, ExternalLink, History, X,
 } from "lucide-react";
-import { useApp } from "@/stores/app";
+import { useAppPick } from "@/stores/app";
 import { aiApi, historyApi, memoryApi } from "@/services/api";
 import { openDrawer } from "@/utils/events";
 import Segmented from "@/components/Segmented";
@@ -17,7 +17,7 @@ const MODES = [
 ] as const;
 
 export default function SearchQA() {
-  const { pendingQuestion, setPendingQuestion } = useApp();
+  const { pendingQuestion, setPendingQuestion } = useAppPick("pendingQuestion", "setPendingQuestion");
   const [question, setQuestion] = useState("");
   const [mode, setMode] = useState<"qa" | "keyword">("qa");
   const [loading, setLoading] = useState(false);
@@ -127,7 +127,7 @@ export default function SearchQA() {
     return (
       <button
         onClick={() => openDrawer(cite.memory_id)}
-        className="mx-0.5 rounded border border-accent/40 bg-accent/10 px-1.5 py-0.5 align-baseline font-mono text-[11px] text-accent transition-colors hover:bg-accent/20"
+        className="mx-0.5 rounded border border-accent/40 bg-accent/10 px-1.5 py-0.5 align-baseline font-mono text-[12px] text-accent transition-colors hover:bg-accent/20"
         title={cite.title}
       >
         [{idx}]
@@ -195,10 +195,10 @@ export default function SearchQA() {
       {answer && (
         <div className="animate-rise mt-5">
           <div className="mb-2 flex items-center gap-2">
-            <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-widest text-accent">
+            <span className="flex items-center gap-1.5 text-[12px] font-semibold tracking-widest text-accent">
               <BookOpen size={11} /> ✦ 回答
             </span>
-            <span className={`rounded-full px-2 py-0.5 text-[10px] ${
+            <span className={`rounded-full px-2 py-0.5 text-[12px] ${
               answer.mode === "memory" ? "bg-accent/10 text-accent" : "bg-base-panel2 text-ink-faint"
             }`}>
               {answer.mode === "memory" ? "来自你的记忆" : "未找到相关记忆"}
@@ -219,7 +219,7 @@ export default function SearchQA() {
                     onClick={() => openDrawer(c.memory_id)}
                     className="flex items-center gap-2 rounded-lg border border-base-border/60 bg-base-panel/60 px-3 py-2.5 text-left transition-all hover:border-accent/25"
                   >
-                    <span className="rounded border border-accent/40 bg-accent/10 px-1 font-mono text-[10px] text-accent">
+                    <span className="rounded border border-accent/40 bg-accent/10 px-1 font-mono text-[12px] text-accent">
                       [{c.index}]
                     </span>
                     <span className="flex-1 truncate text-[13px] text-ink-dim">{c.title}</span>
@@ -276,14 +276,14 @@ export default function SearchQA() {
           {history.length > 0 && (
             <div className="mt-5 w-full max-w-[520px]">
               <div className="mb-2 flex items-center justify-between px-1">
-                <span className="flex items-center gap-1.5 text-[11px] font-medium text-ink-faint">
+                <span className="flex items-center gap-1.5 text-[12px] font-medium text-ink-faint">
                   <History size={11} /> 最近搜索
                 </span>
                 <button
                   onClick={() => {
                     void historyApi.clear().then(loadHistory);
                   }}
-                  className="flex items-center gap-0.5 text-[11px] text-ink-faint transition-colors hover:text-ink-dim"
+                  className="flex items-center gap-0.5 text-[12px] text-ink-faint transition-colors hover:text-ink-dim"
                 >
                   <X size={10} /> 清空
                 </button>

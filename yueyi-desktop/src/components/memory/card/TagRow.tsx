@@ -24,7 +24,7 @@ export default function TagRow({ tags }: { tags: string[] }) {
           #{t}
         </button>
       ))}
-      {more > 0 && <span className="px-1 text-[11px] text-ink-faint">+{more}</span>}
+      {more > 0 && <span className="px-1 text-[12px] text-ink-faint">+{more}</span>}
     </div>
   );
 }
